@@ -1,0 +1,49 @@
+{
+  "data": [
+    {
+      "id": "ocid1.cluster.oc1..aaaokecluster001",
+      "name": "prod-oke-cluster",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "vcn-id": "ocid1.vcn.oc1..aaavcnprod",
+      "kubernetes-version": "v1.28.2",
+      "lifecycle-state": "ACTIVE",
+      "time-created": "2024-06-01T00:00:00Z",
+      "endpoint-config": {
+        "is-public-ip-enabled": true,
+        "subnet-id": "ocid1.subnet.oc1..aaapublic",
+        "nsg-ids": []
+      },
+      "options": {
+        "service-lb-subnet-ids": [
+          "ocid1.subnet.oc1..aaapublic"
+        ],
+        "kubernetes-network-config": {
+          "pods-cidr": "10.244.0.0/16",
+          "services-cidr": "10.96.0.0/16"
+        },
+        "add-ons": {
+          "is-kubernetes-dashboard-enabled": true,
+          "is-tiller-enabled": true
+        },
+        "admission-controller-options": {
+          "is-pod-security-policy-enabled": false
+        }
+      },
+      "cluster-pod-network-options": [
+        {
+          "cni-type": "FLANNEL_OVERLAY"
+        }
+      ],
+      "image-policy-config": {
+        "is-policy-enabled": false,
+        "key-details": []
+      },
+      "type": "BASIC_CLUSTER",
+      "metadata": {
+        "time-updated": "2025-01-15T00:00:00Z",
+        "created-by-user-id": "ocid1.user.oc1..aaauseradmin",
+        "created-by-work-request-id": null
+      }
+    }
+  ]
+}

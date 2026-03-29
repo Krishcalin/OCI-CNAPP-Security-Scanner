@@ -1,0 +1,18 @@
+{"data": [
+  {
+    "id": "ocid1.image.oc1..legacy",
+    "display-name": "Oracle-Linux-6.10",
+    "operating-system": "Oracle Linux",
+    "operating-system-version": "6.10",
+    "lifecycle-state": "DEPRECATED",
+    "time-created": "2020-01-01T00:00:00Z"
+  },
+  {
+    "id": "ocid1.image.oc1..current",
+    "display-name": "Oracle-Linux-8.9",
+    "operating-system": "Oracle Linux",
+    "operating-system-version": "8.9",
+    "lifecycle-state": "AVAILABLE",
+    "time-created": "2025-01-01T00:00:00Z"
+  }
+]}

@@ -1,0 +1,122 @@
+{
+  "data": [
+    {
+      "id": "ocid1.securitylist.oc1..aaaseclistdefault",
+      "display-name": "Default Security List",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "vcn-id": "ocid1.vcn.oc1..aaavcnprod",
+      "lifecycle-state": "AVAILABLE",
+      "time-created": "2024-01-10T00:00:00Z",
+      "ingress-security-rules": [
+        {
+          "source": "0.0.0.0/0",
+          "protocol": "6",
+          "is-stateless": false,
+          "tcp-options": {
+            "destination-port-range": {
+              "min": 22,
+              "max": 22
+            }
+          },
+          "description": "SSH from anywhere"
+        },
+        {
+          "source": "0.0.0.0/0",
+          "protocol": "6",
+          "is-stateless": false,
+          "tcp-options": {
+            "destination-port-range": {
+              "min": 3389,
+              "max": 3389
+            }
+          },
+          "description": "RDP from anywhere"
+        },
+        {
+          "source": "0.0.0.0/0",
+          "protocol": "1",
+          "is-stateless": false,
+          "icmp-options": {
+            "type": 8,
+            "code": 0
+          },
+          "description": "ICMP from anywhere"
+        },
+        {
+          "source": "0.0.0.0/0",
+          "protocol": "6",
+          "is-stateless": false,
+          "tcp-options": {
+            "destination-port-range": {
+              "min": 80,
+              "max": 80
+            }
+          },
+          "description": "HTTP from anywhere"
+        },
+        {
+          "source": "0.0.0.0/0",
+          "protocol": "6",
+          "is-stateless": false,
+          "tcp-options": {
+            "destination-port-range": {
+              "min": 443,
+              "max": 443
+            }
+          },
+          "description": "HTTPS from anywhere"
+        }
+      ],
+      "egress-security-rules": [
+        {
+          "destination": "0.0.0.0/0",
+          "protocol": "all",
+          "is-stateless": false,
+          "description": "Allow all outbound traffic"
+        }
+      ]
+    },
+    {
+      "id": "ocid1.securitylist.oc1..aaaseclistbackend",
+      "display-name": "Backend Security List",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "vcn-id": "ocid1.vcn.oc1..aaavcnprod",
+      "lifecycle-state": "AVAILABLE",
+      "time-created": "2024-01-10T00:00:00Z",
+      "ingress-security-rules": [
+        {
+          "source": "10.0.0.0/16",
+          "protocol": "6",
+          "is-stateless": false,
+          "tcp-options": {
+            "destination-port-range": {
+              "min": 1521,
+              "max": 1521
+            }
+          },
+          "description": "Oracle DB from VCN"
+        },
+        {
+          "source": "0.0.0.0/0",
+          "protocol": "6",
+          "is-stateless": false,
+          "tcp-options": {
+            "destination-port-range": {
+              "min": 8080,
+              "max": 8080
+            }
+          },
+          "description": "App port from anywhere - misconfigured"
+        }
+      ],
+      "egress-security-rules": [
+        {
+          "destination": "0.0.0.0/0",
+          "protocol": "all",
+          "is-stateless": false,
+          "description": "Allow all outbound"
+        }
+      ]
+    }
+  ]
+}

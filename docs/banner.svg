@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F1117"/>
+      <stop offset="50%" stop-color="#1A1A24"/>
+      <stop offset="100%" stop-color="#0F1117"/>
+    </linearGradient>
+    <!-- Oracle red accent gradient -->
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#C74634"/>
+      <stop offset="100%" stop-color="#E85D4A"/>
+    </linearGradient>
+    <!-- Subtle glow for the shield -->
+    <radialGradient id="shieldGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#C74634" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#C74634" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Tag pill gradient -->
+    <linearGradient id="tagGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2A2A3A"/>
+      <stop offset="100%" stop-color="#1E1E2E"/>
+    </linearGradient>
+    <!-- Stat badge gradient -->
+    <linearGradient id="statGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#C74634"/>
+      <stop offset="100%" stop-color="#A63B2C"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="300" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.03" stroke="#ffffff" stroke-width="0.5">
+    <line x1="0" y1="60" x2="1200" y2="60"/>
+    <line x1="0" y1="120" x2="1200" y2="120"/>
+    <line x1="0" y1="180" x2="1200" y2="180"/>
+    <line x1="0" y1="240" x2="1200" y2="240"/>
+    <line x1="200" y1="0" x2="200" y2="300"/>
+    <line x1="400" y1="0" x2="400" y2="300"/>
+    <line x1="600" y1="0" x2="600" y2="300"/>
+    <line x1="800" y1="0" x2="800" y2="300"/>
+    <line x1="1000" y1="0" x2="1000" y2="300"/>
+  </g>
+
+  <!-- Geometric accent: diagonal lines top-right -->
+  <g opacity="0.06" stroke="#C74634" stroke-width="1">
+    <line x1="950" y1="0" x2="1200" y2="250"/>
+    <line x1="1000" y1="0" x2="1200" y2="200"/>
+    <line x1="1050" y1="0" x2="1200" y2="150"/>
+    <line x1="1100" y1="0" x2="1200" y2="100"/>
+    <line x1="1150" y1="0" x2="1200" y2="50"/>
+  </g>
+
+  <!-- Geometric accent: diagonal lines bottom-left -->
+  <g opacity="0.04" stroke="#C74634" stroke-width="1">
+    <line x1="0" y1="200" x2="100" y2="300"/>
+    <line x1="0" y1="230" x2="70" y2="300"/>
+    <line x1="0" y1="260" x2="40" y2="300"/>
+  </g>
+
+  <!-- Top accent bar -->
+  <rect x="0" y="0" width="1200" height="3" fill="url(#accentGrad)"/>
+
+  <!-- Shield + Cloud composite icon -->
+  <g transform="translate(60, 62)">
+    <!-- Glow behind shield -->
+    <circle cx="55" cy="68" r="70" fill="url(#shieldGlow)"/>
+    <!-- Shield body -->
+    <path d="M55 8 L95 28 L95 72 C95 102 75 126 55 136 C35 126 15 102 15 72 L15 28 Z"
+          fill="none" stroke="#C74634" stroke-width="2.5" opacity="0.9"/>
+    <path d="M55 16 L89 33 L89 72 C89 97 72 118 55 127 C38 118 21 97 21 72 L21 33 Z"
+          fill="#C74634" opacity="0.1"/>
+    <!-- Cloud icon inside shield -->
+    <g transform="translate(30, 48)" fill="#C74634" opacity="0.85">
+      <path d="M42 28H10c-4.4 0-8-3.6-8-8 0-3.7 2.5-6.8 6-7.7C8.1 6.8 13.3 2 19.5 2c5.1 0 9.5 3.2 11.3 7.7C31.5 9.2 32.5 9 33.5 9c4.7 0 8.5 3.8 8.5 8.5 0 0.2 0 0.3 0 0.5 2.3 1.3 4 3.8 4 6.5C46 28.6 44.2 28 42 28z"
+            transform="scale(0.52)" />
+    </g>
+    <!-- Checkmark inside shield -->
+    <path d="M40 78 L50 88 L72 62" fill="none" stroke="#C74634" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+  </g>
+
+  <!-- Title text -->
+  <text x="185" y="95" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-weight="700" font-size="38" fill="#FFFFFF" letter-spacing="0.5">
+    OCI CNAPP Security Scanner
+  </text>
+
+  <!-- Subtitle -->
+  <text x="185" y="128" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-weight="400" font-size="15" fill="#8B8FA3" letter-spacing="0.3">
+    Cloud-Native Application Protection Platform for Oracle Cloud Infrastructure
+  </text>
+
+  <!-- Feature tags row -->
+  <g transform="translate(185, 150)">
+    <!-- CSPM -->
+    <rect x="0" y="0" width="68" height="28" rx="6" fill="url(#tagGrad)" stroke="#C74634" stroke-width="1" opacity="0.9"/>
+    <text x="34" y="18" font-family="Segoe UI, Consolas, monospace" font-weight="600" font-size="11" fill="#E8E8F0" text-anchor="middle">CSPM</text>
+
+    <!-- CIEM -->
+    <rect x="80" y="0" width="66" height="28" rx="6" fill="url(#tagGrad)" stroke="#C74634" stroke-width="1" opacity="0.9"/>
+    <text x="113" y="18" font-family="Segoe UI, Consolas, monospace" font-weight="600" font-size="11" fill="#E8E8F0" text-anchor="middle">CIEM</text>
+
+    <!-- CWPP -->
+    <rect x="158" y="0" width="68" height="28" rx="6" fill="url(#tagGrad)" stroke="#C74634" stroke-width="1" opacity="0.9"/>
+    <text x="192" y="18" font-family="Segoe UI, Consolas, monospace" font-weight="600" font-size="11" fill="#E8E8F0" text-anchor="middle">CWPP</text>
+
+    <!-- KSPM -->
+    <rect x="238" y="0" width="68" height="28" rx="6" fill="url(#tagGrad)" stroke="#C74634" stroke-width="1" opacity="0.9"/>
+    <text x="272" y="18" font-family="Segoe UI, Consolas, monospace" font-weight="600" font-size="11" fill="#E8E8F0" text-anchor="middle">KSPM</text>
+
+    <!-- IaC -->
+    <rect x="318" y="0" width="56" height="28" rx="6" fill="url(#tagGrad)" stroke="#C74634" stroke-width="1" opacity="0.9"/>
+    <text x="346" y="18" font-family="Segoe UI, Consolas, monospace" font-weight="600" font-size="11" fill="#E8E8F0" text-anchor="middle">IaC</text>
+
+    <!-- CIS Benchmark -->
+    <rect x="386" y="0" width="116" height="28" rx="6" fill="url(#tagGrad)" stroke="#C74634" stroke-width="1" opacity="0.9"/>
+    <text x="444" y="18" font-family="Segoe UI, Consolas, monospace" font-weight="600" font-size="11" fill="#E8E8F0" text-anchor="middle">CIS Benchmark</text>
+  </g>
+
+  <!-- Stats row -->
+  <g transform="translate(185, 210)">
+    <!-- 76 Checks -->
+    <rect x="0" y="0" width="120" height="36" rx="8" fill="url(#statGrad)" opacity="0.9"/>
+    <text x="60" y="16" font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="14" fill="#FFFFFF" text-anchor="middle">76</text>
+    <text x="60" y="30" font-family="Segoe UI, Arial, sans-serif" font-weight="400" font-size="10" fill="#FFD4CF" text-anchor="middle" letter-spacing="0.5">CHECKS</text>
+
+    <!-- 13 Modules -->
+    <rect x="136" y="0" width="120" height="36" rx="8" fill="url(#statGrad)" opacity="0.9"/>
+    <text x="196" y="16" font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="14" fill="#FFFFFF" text-anchor="middle">13</text>
+    <text x="196" y="30" font-family="Segoe UI, Arial, sans-serif" font-weight="400" font-size="10" fill="#FFD4CF" text-anchor="middle" letter-spacing="0.5">MODULES</text>
+
+    <!-- Zero Dependencies -->
+    <rect x="272" y="0" width="148" height="36" rx="8" fill="url(#statGrad)" opacity="0.9"/>
+    <text x="346" y="16" font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="14" fill="#FFFFFF" text-anchor="middle">Zero</text>
+    <text x="346" y="30" font-family="Segoe UI, Arial, sans-serif" font-weight="400" font-size="10" fill="#FFD4CF" text-anchor="middle" letter-spacing="0.5">DEPENDENCIES</text>
+  </g>
+
+  <!-- Right-side decorative element: abstract cloud nodes -->
+  <g transform="translate(880, 80)" opacity="0.12">
+    <!-- Interconnected nodes representing cloud infrastructure -->
+    <circle cx="0" cy="0" r="6" fill="#C74634"/>
+    <circle cx="80" cy="-30" r="5" fill="#C74634"/>
+    <circle cx="160" cy="10" r="7" fill="#C74634"/>
+    <circle cx="60" cy="60" r="5" fill="#C74634"/>
+    <circle cx="140" cy="80" r="6" fill="#C74634"/>
+    <circle cx="200" cy="50" r="4" fill="#C74634"/>
+    <circle cx="30" cy="120" r="5" fill="#C74634"/>
+    <circle cx="120" cy="130" r="6" fill="#C74634"/>
+    <circle cx="220" cy="110" r="5" fill="#C74634"/>
+    <circle cx="180" cy="-20" r="4" fill="#C74634"/>
+    <!-- Connection lines -->
+    <line x1="0" y1="0" x2="80" y2="-30" stroke="#C74634" stroke-width="1"/>
+    <line x1="80" y1="-30" x2="160" y2="10" stroke="#C74634" stroke-width="1"/>
+    <line x1="0" y1="0" x2="60" y2="60" stroke="#C74634" stroke-width="1"/>
+    <line x1="60" y1="60" x2="140" y2="80" stroke="#C74634" stroke-width="1"/>
+    <line x1="160" y1="10" x2="200" y2="50" stroke="#C74634" stroke-width="1"/>
+    <line x1="200" y1="50" x2="220" y2="110" stroke="#C74634" stroke-width="1"/>
+    <line x1="140" y1="80" x2="120" y2="130" stroke="#C74634" stroke-width="1"/>
+    <line x1="60" y1="60" x2="30" y2="120" stroke="#C74634" stroke-width="1"/>
+    <line x1="30" y1="120" x2="120" y2="130" stroke="#C74634" stroke-width="1"/>
+    <line x1="120" y1="130" x2="220" y2="110" stroke="#C74634" stroke-width="1"/>
+    <line x1="80" y1="-30" x2="180" y2="-20" stroke="#C74634" stroke-width="1"/>
+    <line x1="180" y1="-20" x2="160" y2="10" stroke="#C74634" stroke-width="1"/>
+    <line x1="140" y1="80" x2="200" y2="50" stroke="#C74634" stroke-width="1"/>
+  </g>
+
+  <!-- Oracle branding accent: small "OCI" badge -->
+  <g transform="translate(1080, 250)">
+    <rect x="0" y="0" width="80" height="24" rx="4" fill="#C74634" opacity="0.15" stroke="#C74634" stroke-width="0.8" stroke-opacity="0.4"/>
+    <text x="40" y="16" font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="11" fill="#C74634" text-anchor="middle" letter-spacing="1.5">ORACLE</text>
+  </g>
+
+  <!-- Python badge -->
+  <g transform="translate(185, 262)">
+    <rect x="0" y="0" width="92" height="22" rx="4" fill="#2A2A3A" stroke="#4B8BBE" stroke-width="0.8" opacity="0.8"/>
+    <text x="46" y="15" font-family="Segoe UI, Consolas, monospace" font-weight="500" font-size="10" fill="#4B8BBE" text-anchor="middle">Python 3.8+</text>
+  </g>
+
+  <!-- Version badge -->
+  <g transform="translate(290, 262)">
+    <rect x="0" y="0" width="68" height="22" rx="4" fill="#2A2A3A" stroke="#6C6C80" stroke-width="0.8" opacity="0.8"/>
+    <text x="34" y="15" font-family="Segoe UI, Consolas, monospace" font-weight="500" font-size="10" fill="#8B8FA3" text-anchor="middle">v1.0.0</text>
+  </g>
+
+  <!-- Bottom accent bar -->
+  <rect x="0" y="297" width="1200" height="3" fill="url(#accentGrad)"/>
+</svg>

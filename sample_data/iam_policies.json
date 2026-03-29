@@ -1,0 +1,43 @@
+{
+  "data": [
+    {
+      "id": "ocid1.policy.oc1..aaapolicyadmin",
+      "name": "AdminFullAccess",
+      "description": "Full tenancy access for administrators",
+      "compartment-id": "ocid1.tenancy.oc1..aaaaexample",
+      "lifecycle-state": "ACTIVE",
+      "time-created": "2024-01-05T00:00:00Z",
+      "statements": [
+        "Allow group Administrators to manage all-resources in tenancy",
+        "Allow group Administrators to manage users in tenancy",
+        "Allow group Administrators to manage policies in tenancy"
+      ]
+    },
+    {
+      "id": "ocid1.policy.oc1..aaapolicydev",
+      "name": "DeveloperBroadAccess",
+      "description": "Broad access for developer group",
+      "compartment-id": "ocid1.tenancy.oc1..aaaaexample",
+      "lifecycle-state": "ACTIVE",
+      "time-created": "2024-03-20T00:00:00Z",
+      "statements": [
+        "Allow group Developers to use all-resources in tenancy",
+        "Allow group Developers to manage instances in compartment production",
+        "Allow group Developers to manage object-family in compartment production"
+      ]
+    },
+    {
+      "id": "ocid1.policy.oc1..aaapolicykeys",
+      "name": "KeyManagementPolicy",
+      "description": "Key management access",
+      "compartment-id": "ocid1.tenancy.oc1..aaaaexample",
+      "lifecycle-state": "ACTIVE",
+      "time-created": "2024-04-10T00:00:00Z",
+      "statements": [
+        "Allow group Administrators to manage keys in tenancy",
+        "Allow group Administrators to manage vaults in tenancy",
+        "Allow service objectstorage-us-ashburn-1 to use keys in tenancy"
+      ]
+    }
+  ]
+}

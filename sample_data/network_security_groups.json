@@ -1,0 +1,47 @@
+{
+  "data": [
+    {
+      "id": "ocid1.networksecuritygroup.oc1..aaansg001",
+      "display-name": "web-tier-nsg",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "vcn-id": "ocid1.vcn.oc1..aaavcnprod",
+      "lifecycle-state": "AVAILABLE",
+      "time-created": "2024-02-20T00:00:00Z",
+      "rules": [
+        {
+          "id": "ocid1.nsgrule.oc1..aaarule001",
+          "direction": "INGRESS",
+          "source": "0.0.0.0/0",
+          "source-type": "CIDR_BLOCK",
+          "protocol": "all",
+          "is-stateless": false,
+          "description": "Allow all inbound - MISCONFIGURED"
+        },
+        {
+          "id": "ocid1.nsgrule.oc1..aaarule002",
+          "direction": "INGRESS",
+          "source": "0.0.0.0/0",
+          "source-type": "CIDR_BLOCK",
+          "protocol": "6",
+          "is-stateless": false,
+          "tcp-options": {
+            "destination-port-range": {
+              "min": 22,
+              "max": 22
+            }
+          },
+          "description": "SSH from anywhere"
+        },
+        {
+          "id": "ocid1.nsgrule.oc1..aaarule003",
+          "direction": "EGRESS",
+          "destination": "0.0.0.0/0",
+          "destination-type": "CIDR_BLOCK",
+          "protocol": "all",
+          "is-stateless": false,
+          "description": "Allow all outbound"
+        }
+      ]
+    }
+  ]
+}

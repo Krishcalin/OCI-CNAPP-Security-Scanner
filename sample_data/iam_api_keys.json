@@ -1,0 +1,28 @@
+{
+  "data": [
+    {
+      "key-id": "ocid1.apikey.oc1..aaaapikey001",
+      "key-value": "aa:bb:cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99",
+      "user-id": "ocid1.user.oc1..aaauseradmin",
+      "lifecycle-state": "ACTIVE",
+      "time-created": "2025-01-15T00:00:00Z",
+      "fingerprint": "12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef"
+    },
+    {
+      "key-id": "ocid1.apikey.oc1..aaaapikey002",
+      "key-value": "bb:cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99:aa",
+      "user-id": "ocid1.user.oc1..aaauserdev",
+      "lifecycle-state": "ACTIVE",
+      "time-created": "2025-01-15T00:00:00Z",
+      "fingerprint": "ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90"
+    },
+    {
+      "key-id": "ocid1.apikey.oc1..aaaapikey003",
+      "key-value": "cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99:aa:bb",
+      "user-id": "ocid1.user.oc1..aaauserservice",
+      "lifecycle-state": "INACTIVE",
+      "time-created": "2024-06-01T00:00:00Z",
+      "fingerprint": "ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd"
+    }
+  ]
+}

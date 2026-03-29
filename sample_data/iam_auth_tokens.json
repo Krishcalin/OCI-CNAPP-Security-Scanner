@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "id": "ocid1.authtoken.oc1..aaatoken001",
+      "user-id": "ocid1.user.oc1..aaauseradmin",
+      "description": "OCIR push token for CI/CD",
+      "lifecycle-state": "ACTIVE",
+      "time-created": "2025-02-01T00:00:00Z",
+      "time-expires": null,
+      "token": "REDACTED"
+    },
+    {
+      "id": "ocid1.authtoken.oc1..aaatoken002",
+      "user-id": "ocid1.user.oc1..aaauserservice",
+      "description": "Streaming token for service account",
+      "lifecycle-state": "ACTIVE",
+      "time-created": "2025-02-01T00:00:00Z",
+      "time-expires": null,
+      "token": "REDACTED"
+    }
+  ]
+}

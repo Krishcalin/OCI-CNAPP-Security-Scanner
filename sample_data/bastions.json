@@ -1,0 +1,12 @@
+{"data": [
+  {
+    "id": "ocid1.bastion.oc1..aaabast1",
+    "name": "prod-bastion",
+    "display-name": "prod-bastion",
+    "lifecycle-state": "ACTIVE",
+    "target-vcn-id": "ocid1.vcn.oc1..aaa1",
+    "target-subnet-id": "ocid1.subnet.oc1..aaaprivate",
+    "max-session-ttl-in-seconds": 43200,
+    "time-created": "2025-06-01T00:00:00Z"
+  }
+]}

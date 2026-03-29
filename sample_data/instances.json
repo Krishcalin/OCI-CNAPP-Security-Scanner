@@ -1,0 +1,130 @@
+{
+  "data": [
+    {
+      "id": "ocid1.instance.oc1..aaainstweb1",
+      "display-name": "web-server-1",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "availability-domain": "AD-1",
+      "lifecycle-state": "RUNNING",
+      "shape": "VM.Standard.E4.Flex",
+      "time-created": "2024-05-10T12:00:00Z",
+      "image-id": "ocid1.image.oc1..legacy",
+      "subnet-id": "ocid1.subnet.oc1..aaapublic",
+      "public-ip": "129.213.100.10",
+      "private-ip": "10.0.1.10",
+      "platform-config": {
+        "type": "AMD_VM",
+        "is-secure-boot-enabled": false,
+        "is-measured-boot-enabled": false,
+        "is-trusted-platform-module-enabled": false
+      },
+      "launch-options": {
+        "boot-volume-type": "PARAVIRTUALIZED",
+        "firmware": "UEFI_64",
+        "network-type": "PARAVIRTUALIZED",
+        "is-pv-encryption-in-transit-enabled": false,
+        "is-consistent-volume-naming-enabled": true
+      },
+      "instance-options": {
+        "are-legacy-imds-endpoints-disabled": false
+      },
+      "agent-config": {
+        "is-monitoring-disabled": false,
+        "is-management-disabled": false,
+        "are-all-plugins-disabled": false,
+        "plugins-config": []
+      },
+      "shape-config": {
+        "ocpus": 2,
+        "memory-in-gbs": 16
+      },
+      "metadata": {
+        "ssh_authorized_keys": "ssh-rsa AAAAB3NzaC1yc2EAAAA..."
+      }
+    },
+    {
+      "id": "ocid1.instance.oc1..aaainstapp1",
+      "display-name": "app-server-1",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "availability-domain": "AD-2",
+      "lifecycle-state": "RUNNING",
+      "shape": "VM.Standard.E4.Flex",
+      "time-created": "2024-05-10T12:30:00Z",
+      "image-id": "ocid1.image.oc1..aaaimage002",
+      "subnet-id": "ocid1.subnet.oc1..aaapublic",
+      "public-ip": "129.213.100.20",
+      "private-ip": "10.0.1.20",
+      "platform-config": {
+        "type": "AMD_VM",
+        "is-secure-boot-enabled": false,
+        "is-measured-boot-enabled": false,
+        "is-trusted-platform-module-enabled": false
+      },
+      "launch-options": {
+        "boot-volume-type": "PARAVIRTUALIZED",
+        "firmware": "UEFI_64",
+        "network-type": "PARAVIRTUALIZED",
+        "is-pv-encryption-in-transit-enabled": false,
+        "is-consistent-volume-naming-enabled": true
+      },
+      "instance-options": {
+        "are-legacy-imds-endpoints-disabled": false
+      },
+      "agent-config": {
+        "is-monitoring-disabled": false,
+        "is-management-disabled": false,
+        "are-all-plugins-disabled": false,
+        "plugins-config": []
+      },
+      "shape-config": {
+        "ocpus": 4,
+        "memory-in-gbs": 32
+      },
+      "metadata": {
+        "ssh_authorized_keys": "ssh-rsa AAAAB3NzaC1yc2EAAAA..."
+      }
+    },
+    {
+      "id": "ocid1.instance.oc1..aaainstdb1",
+      "display-name": "db-server-1",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "availability-domain": "AD-1",
+      "lifecycle-state": "RUNNING",
+      "shape": "VM.Standard.E4.Flex",
+      "time-created": "2024-04-01T08:00:00Z",
+      "image-id": "ocid1.image.oc1..aaaimage003",
+      "subnet-id": "ocid1.subnet.oc1..aaaprivate",
+      "public-ip": null,
+      "private-ip": "10.0.2.10",
+      "platform-config": {
+        "type": "AMD_VM",
+        "is-secure-boot-enabled": true,
+        "is-measured-boot-enabled": true,
+        "is-trusted-platform-module-enabled": true
+      },
+      "launch-options": {
+        "boot-volume-type": "PARAVIRTUALIZED",
+        "firmware": "UEFI_64",
+        "network-type": "PARAVIRTUALIZED",
+        "is-pv-encryption-in-transit-enabled": false,
+        "is-consistent-volume-naming-enabled": true
+      },
+      "instance-options": {
+        "are-legacy-imds-endpoints-disabled": true
+      },
+      "agent-config": {
+        "is-monitoring-disabled": false,
+        "is-management-disabled": false,
+        "are-all-plugins-disabled": false,
+        "plugins-config": []
+      },
+      "shape-config": {
+        "ocpus": 8,
+        "memory-in-gbs": 64
+      },
+      "metadata": {
+        "ssh_authorized_keys": "ssh-rsa AAAAB3NzaC1yc2EAAAA..."
+      }
+    }
+  ]
+}

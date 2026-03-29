@@ -1,0 +1,33 @@
+{
+  "format_version": "1.0",
+  "terraform_version": "1.5.0",
+  "resource_changes": [
+    {
+      "address": "oci_core_instance.legacy_server",
+      "type": "oci_core_instance",
+      "change": {
+        "actions": ["delete"],
+        "before": {"display_name": "legacy-server-01"},
+        "after": null
+      }
+    },
+    {
+      "address": "oci_core_security_list.old_rules",
+      "type": "oci_core_security_list",
+      "change": {
+        "actions": ["delete"],
+        "before": {"display_name": "old-security-rules"},
+        "after": null
+      }
+    },
+    {
+      "address": "oci_core_instance.new_server",
+      "type": "oci_core_instance",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {"display_name": "new-server-01"}
+      }
+    }
+  ]
+}

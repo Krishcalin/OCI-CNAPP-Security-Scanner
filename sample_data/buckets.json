@@ -1,0 +1,69 @@
+{
+  "data": [
+    {
+      "name": "public-assets",
+      "namespace": "example-namespace",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "created-by": "ocid1.user.oc1..aaauseradmin",
+      "time-created": "2024-03-01T00:00:00Z",
+      "public-access-type": "ObjectRead",
+      "storage-tier": "Standard",
+      "versioning": "Disabled",
+      "kms-key-id": "",
+      "object-lifecycle-policy-etag": null,
+      "replication-enabled": false,
+      "is-read-only": false,
+      "approximate-count": 1250,
+      "approximate-size": 5368709120,
+      "auto-tiering": "Disabled",
+      "object-events-enabled": false,
+      "metadata": {},
+      "freeform-tags": {},
+      "defined-tags": {}
+    },
+    {
+      "name": "app-data",
+      "namespace": "example-namespace",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "created-by": "ocid1.user.oc1..aaauserdev",
+      "time-created": "2024-04-15T00:00:00Z",
+      "public-access-type": "NoPublicAccess",
+      "storage-tier": "Standard",
+      "versioning": "Disabled",
+      "kms-key-id": "",
+      "object-lifecycle-policy-etag": null,
+      "replication-enabled": false,
+      "is-read-only": false,
+      "approximate-count": 340,
+      "approximate-size": 1073741824,
+      "auto-tiering": "Disabled",
+      "object-events-enabled": false,
+      "metadata": {},
+      "freeform-tags": {},
+      "defined-tags": {}
+    },
+    {
+      "name": "backups",
+      "namespace": "example-namespace",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "created-by": "ocid1.user.oc1..aaauseradmin",
+      "time-created": "2024-02-01T00:00:00Z",
+      "public-access-type": "NoPublicAccess",
+      "storage-tier": "Standard",
+      "versioning": "Enabled",
+      "kms-key-id": "ocid1.key.oc1..aaakey001",
+      "object-lifecycle-policy-etag": "lifecycle-v1",
+      "replication-enabled": true,
+      "is-read-only": false,
+      "approximate-count": 890,
+      "approximate-size": 10737418240,
+      "auto-tiering": "InfrequentAccess",
+      "object-events-enabled": true,
+      "metadata": {},
+      "freeform-tags": {
+        "Environment": "production"
+      },
+      "defined-tags": {}
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "data": [
+    {
+      "id": "ocid1.vault.oc1..aaavault001",
+      "display-name": "prod-vault",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "vault-type": "DEFAULT",
+      "lifecycle-state": "ACTIVE",
+      "crypto-endpoint": "https://aaavault001-crypto.kms.us-ashburn-1.oraclecloud.com",
+      "management-endpoint": "https://aaavault001-management.kms.us-ashburn-1.oraclecloud.com",
+      "time-created": "2024-01-15T00:00:00Z",
+      "is-primary": true,
+      "replica-details": null,
+      "restored-from-vault-id": null
+    }
+  ]
+}

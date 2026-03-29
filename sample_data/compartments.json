@@ -1,0 +1,31 @@
+{
+  "data": [
+    {
+      "id": "ocid1.tenancy.oc1..aaaaexample",
+      "name": "root",
+      "description": "Root compartment (tenancy)",
+      "compartment-id": "ocid1.tenancy.oc1..aaaaexample",
+      "lifecycle-state": "ACTIVE",
+      "time-created": "2023-01-01T00:00:00Z",
+      "is-accessible": true
+    },
+    {
+      "id": "ocid1.compartment.oc1..aaaprod",
+      "name": "production",
+      "description": "Production workloads",
+      "compartment-id": "ocid1.tenancy.oc1..aaaaexample",
+      "lifecycle-state": "ACTIVE",
+      "time-created": "2023-06-15T00:00:00Z",
+      "is-accessible": true
+    },
+    {
+      "id": "ocid1.compartment.oc1..aaadev",
+      "name": "development",
+      "description": "Development and testing",
+      "compartment-id": "ocid1.tenancy.oc1..aaaaexample",
+      "lifecycle-state": "ACTIVE",
+      "time-created": "2023-06-15T00:00:00Z",
+      "is-accessible": true
+    }
+  ]
+}

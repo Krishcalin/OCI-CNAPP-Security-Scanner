@@ -1,0 +1,42 @@
+{
+  "data": [
+    {
+      "id": "ocid1.key.oc1..aaakey001",
+      "display-name": "master-encryption-key",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "vault-id": "ocid1.vault.oc1..aaavault001",
+      "lifecycle-state": "ENABLED",
+      "protection-mode": "SOFTWARE",
+      "algorithm": "AES",
+      "key-shape": {
+        "algorithm": "AES",
+        "length": 32,
+        "curve-id": null
+      },
+      "time-created": "2024-06-01T00:00:00Z",
+      "current-key-version": "ocid1.keyversion.oc1..aaakeyver001",
+      "is-primary": true,
+      "replica-details": null,
+      "auto-key-rotation-details": null
+    },
+    {
+      "id": "ocid1.key.oc1..aaakey002",
+      "display-name": "app-data-key",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "vault-id": "ocid1.vault.oc1..aaavault001",
+      "lifecycle-state": "ENABLED",
+      "protection-mode": "SOFTWARE",
+      "algorithm": "AES",
+      "key-shape": {
+        "algorithm": "AES",
+        "length": 32,
+        "curve-id": null
+      },
+      "time-created": "2024-09-01T00:00:00Z",
+      "current-key-version": "ocid1.keyversion.oc1..aaakeyver002",
+      "is-primary": true,
+      "replica-details": null,
+      "auto-key-rotation-details": null
+    }
+  ]
+}

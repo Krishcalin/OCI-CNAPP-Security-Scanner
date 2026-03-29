@@ -1,0 +1,22 @@
+{"data": [
+  {
+    "id": "ocid1.routetable.oc1..aaa1",
+    "display-name": "empty-route-table",
+    "vcn-id": "ocid1.vcn.oc1..aaa1",
+    "lifecycle-state": "AVAILABLE",
+    "route-rules": []
+  },
+  {
+    "id": "ocid1.routetable.oc1..aaa2",
+    "display-name": "prod-route-table",
+    "vcn-id": "ocid1.vcn.oc1..aaa1",
+    "lifecycle-state": "AVAILABLE",
+    "route-rules": [
+      {
+        "destination": "0.0.0.0/0",
+        "destination-type": "CIDR_BLOCK",
+        "network-entity-id": "ocid1.internetgateway.oc1..aaa1"
+      }
+    ]
+  }
+]}

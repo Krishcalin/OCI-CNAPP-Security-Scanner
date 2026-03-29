@@ -1,0 +1,29 @@
+{"data": [
+  {
+    "id": "ocid1.problem.oc1..aaa1",
+    "lifecycle-state": "ACTIVE",
+    "risk-level": "CRITICAL",
+    "detector-rule-id-display-name": "Bucket is publicly accessible",
+    "time-first-detected": "2026-03-01T00:00:00Z"
+  },
+  {
+    "id": "ocid1.problem.oc1..aaa2",
+    "lifecycle-state": "ACTIVE",
+    "risk-level": "HIGH",
+    "detector-rule-id-display-name": "Instance has public IP address",
+    "time-first-detected": "2026-03-05T00:00:00Z"
+  },
+  {
+    "id": "ocid1.problem.oc1..aaa3",
+    "lifecycle-state": "ACTIVE",
+    "risk-level": "HIGH",
+    "detector-rule-id-display-name": "Security list allows SSH from internet",
+    "time-first-detected": "2026-03-10T00:00:00Z"
+  },
+  {
+    "id": "ocid1.problem.oc1..aaa4",
+    "lifecycle-state": "RESOLVED",
+    "risk-level": "MEDIUM",
+    "detector-rule-id-display-name": "VCN flow logs disabled"
+  }
+]}

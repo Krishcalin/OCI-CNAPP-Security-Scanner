@@ -1,0 +1,18 @@
+{"data": [
+  {
+    "id": "ocid1.mysqldbsystem.oc1..aaa1",
+    "display-name": "analytics-mysql",
+    "lifecycle-state": "ACTIVE",
+    "is-publicly-accessible": true,
+    "subnet-id": "ocid1.subnet.oc1..aaapublic",
+    "endpoints": [
+      {
+        "ip-address": "129.146.10.50",
+        "port": 3306,
+        "modes": ["READ", "WRITE"],
+        "status": "ACTIVE"
+      }
+    ],
+    "time-created": "2025-06-01T00:00:00Z"
+  }
+]}

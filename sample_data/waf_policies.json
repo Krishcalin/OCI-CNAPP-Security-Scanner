@@ -1,0 +1,87 @@
+{
+  "data": [
+    {
+      "id": "ocid1.wafpolicy.oc1..aaawaf001",
+      "display-name": "default-waf-policy",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "lifecycle-state": "ACTIVE",
+      "time-created": "2024-08-01T00:00:00Z",
+      "actions": [
+        {
+          "name": "allowAction",
+          "type": "ALLOW"
+        },
+        {
+          "name": "checkAction",
+          "type": "CHECK"
+        }
+      ],
+      "request-access-control": {
+        "default-action-name": "allowAction",
+        "rules": []
+      },
+      "request-rate-limiting": {
+        "rules": []
+      },
+      "request-protection": {
+        "rules": [
+          {
+            "name": "xss-protection",
+            "type": "PROTECTION",
+            "action-name": "checkAction",
+            "is-enabled": false,
+            "protection-capabilities": [
+              {
+                "key": "941100",
+                "version": 1,
+                "collaborative-weights": [],
+                "exclusions": null
+              }
+            ],
+            "condition": null
+          },
+          {
+            "name": "sqli-protection",
+            "type": "PROTECTION",
+            "action-name": "checkAction",
+            "is-enabled": false,
+            "protection-capabilities": [
+              {
+                "key": "942100",
+                "version": 1,
+                "collaborative-weights": [],
+                "exclusions": null
+              }
+            ],
+            "condition": null
+          },
+          {
+            "name": "rce-protection",
+            "type": "PROTECTION",
+            "action-name": "checkAction",
+            "is-enabled": false,
+            "protection-capabilities": [
+              {
+                "key": "932100",
+                "version": 1,
+                "collaborative-weights": [],
+                "exclusions": null
+              }
+            ],
+            "condition": null
+          }
+        ],
+        "body-inspection-size-limit-in-bytes": 8192
+      },
+      "response-access-control": {
+        "rules": []
+      },
+      "response-protection": {
+        "rules": []
+      },
+      "freeform-tags": {},
+      "defined-tags": {},
+      "system-tags": {}
+    }
+  ]
+}

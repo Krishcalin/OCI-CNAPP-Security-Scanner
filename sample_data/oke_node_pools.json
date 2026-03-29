@@ -1,0 +1,59 @@
+{
+  "data": [
+    {
+      "id": "ocid1.nodepool.oc1..aaanodepool001",
+      "name": "prod-node-pool",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "cluster-id": "ocid1.cluster.oc1..aaaokecluster001",
+      "kubernetes-version": "v1.27.2",
+      "lifecycle-state": "ACTIVE",
+      "node-shape": "VM.Standard.E4.Flex",
+      "node-shape-config": {
+        "ocpus": 4,
+        "memory-in-gbs": 32
+      },
+      "node-source": {
+        "source-type": "IMAGE",
+        "image-id": "ocid1.image.oc1..aaaokeimage001"
+      },
+      "node-config-details": {
+        "size": 3,
+        "placement-configs": [
+          {
+            "availability-domain": "AD-1",
+            "subnet-id": "ocid1.subnet.oc1..aaapublic"
+          },
+          {
+            "availability-domain": "AD-2",
+            "subnet-id": "ocid1.subnet.oc1..aaapublic"
+          }
+        ],
+        "nsg-ids": [],
+        "is-pv-encryption-in-transit-enabled": false,
+        "node-pool-pod-network-option-details": {
+          "cni-type": "FLANNEL_OVERLAY"
+        }
+      },
+      "node-metadata": {},
+      "ssh-public-key": "ssh-rsa AAAAB3NzaC1yc2EAAAA...",
+      "initial-node-labels": [
+        {
+          "key": "environment",
+          "value": "production"
+        }
+      ],
+      "node-eviction-node-pool-settings": {
+        "eviction-grace-duration": "PT60M",
+        "is-force-delete-after-grace-duration": false
+      },
+      "node-pool-cycling-details": {
+        "is-node-cycling-enabled": false,
+        "maximum-surge": "1",
+        "maximum-unavailable": "0"
+      },
+      "is-secure-boot-enabled": false,
+      "is-auto-upgrade-enabled": false,
+      "time-created": "2024-06-01T00:00:00Z"
+    }
+  ]
+}

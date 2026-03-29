@@ -1,0 +1,135 @@
+{
+  "data": [
+    {
+      "id": "ocid1.loadbalancer.oc1..aaalb001",
+      "display-name": "prod-public-lb",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "lifecycle-state": "ACTIVE",
+      "shape-name": "flexible",
+      "shape-details": {
+        "minimum-bandwidth-in-mbps": 10,
+        "maximum-bandwidth-in-mbps": 100
+      },
+      "ip-addresses": [
+        {
+          "ip-address": "129.213.200.10",
+          "is-public": true
+        }
+      ],
+      "is-private": false,
+      "subnet-ids": [
+        "ocid1.subnet.oc1..aaapublic"
+      ],
+      "network-security-group-ids": [],
+      "listeners": {
+        "http-listener": {
+          "name": "http-listener",
+          "port": 80,
+          "protocol": "HTTP",
+          "default-backend-set-name": "web-backend-set",
+          "ssl-configuration": null
+        },
+        "https-listener": {
+          "name": "https-listener",
+          "port": 443,
+          "protocol": "HTTP",
+          "default-backend-set-name": "web-backend-set",
+          "ssl-configuration": {
+            "certificate-name": "prod-cert",
+            "verify-depth": 1,
+            "verify-peer-certificate": false,
+            "protocols": [
+              "TLSv1",
+              "TLSv1.1",
+              "TLSv1.2"
+            ],
+            "cipher-suite-name": "oci-default-ssl-cipher-suite-v1"
+          }
+        }
+      },
+      "backend-sets": {
+        "web-backend-set": {
+          "name": "web-backend-set",
+          "policy": "ROUND_ROBIN",
+          "backends": [
+            {
+              "ip-address": "10.0.1.10",
+              "port": 8080,
+              "weight": 1,
+              "is-drain": false,
+              "is-offline": false,
+              "is-backup": false
+            }
+          ],
+          "health-checker": {
+            "protocol": "HTTP",
+            "port": 8080,
+            "url-path": "/health",
+            "interval-in-millis": 30000,
+            "timeout-in-millis": 3000,
+            "retries": 3,
+            "return-code": 200
+          }
+        }
+      },
+      "waf-policy-id": null,
+      "time-created": "2024-05-20T00:00:00Z"
+    },
+    {
+      "id": "ocid1.loadbalancer.oc1..aaalb002",
+      "display-name": "internal-api-lb",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "lifecycle-state": "ACTIVE",
+      "shape-name": "flexible",
+      "shape-details": {
+        "minimum-bandwidth-in-mbps": 10,
+        "maximum-bandwidth-in-mbps": 50
+      },
+      "ip-addresses": [
+        {
+          "ip-address": "10.0.2.50",
+          "is-public": false
+        }
+      ],
+      "is-private": true,
+      "subnet-ids": [
+        "ocid1.subnet.oc1..aaaprivate"
+      ],
+      "network-security-group-ids": [],
+      "listeners": {
+        "api-listener": {
+          "name": "api-listener",
+          "port": 8443,
+          "protocol": "HTTP",
+          "default-backend-set-name": "api-backend-set",
+          "ssl-configuration": null
+        }
+      },
+      "backend-sets": {
+        "api-backend-set": {
+          "name": "api-backend-set",
+          "policy": "ROUND_ROBIN",
+          "backends": [
+            {
+              "ip-address": "10.0.2.10",
+              "port": 8080,
+              "weight": 1,
+              "is-drain": false,
+              "is-offline": false,
+              "is-backup": false
+            }
+          ],
+          "health-checker": {
+            "protocol": "TCP",
+            "port": 8080,
+            "interval-in-millis": 30000,
+            "timeout-in-millis": 3000,
+            "retries": 3
+          }
+        }
+      },
+      "waf-policy-id": null,
+      "time-created": "2024-06-10T00:00:00Z"
+    }
+  ]
+}

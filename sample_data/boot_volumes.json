@@ -1,0 +1,32 @@
+{
+  "data": [
+    {
+      "id": "ocid1.bootvolume.oc1..aaabv001",
+      "display-name": "web-server-1-boot",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "availability-domain": "AD-1",
+      "lifecycle-state": "AVAILABLE",
+      "size-in-gbs": 50,
+      "kms-key-id": "",
+      "image-id": "ocid1.image.oc1..aaaimage001",
+      "instance-id": "ocid1.instance.oc1..aaainstweb1",
+      "is-auto-tune-enabled": true,
+      "vpus-per-gb": 10,
+      "time-created": "2024-05-10T12:00:00Z"
+    },
+    {
+      "id": "ocid1.bootvolume.oc1..aaabv002",
+      "display-name": "app-server-1-boot",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "availability-domain": "AD-2",
+      "lifecycle-state": "AVAILABLE",
+      "size-in-gbs": 50,
+      "kms-key-id": "",
+      "image-id": "ocid1.image.oc1..aaaimage002",
+      "instance-id": "ocid1.instance.oc1..aaainstapp1",
+      "is-auto-tune-enabled": true,
+      "vpus-per-gb": 10,
+      "time-created": "2024-05-10T12:30:00Z"
+    }
+  ]
+}

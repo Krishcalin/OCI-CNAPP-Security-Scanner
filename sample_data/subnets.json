@@ -1,0 +1,52 @@
+{
+  "data": [
+    {
+      "id": "ocid1.subnet.oc1..aaapublic",
+      "display-name": "public-subnet-prod",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "vcn-id": "ocid1.vcn.oc1..aaavcnprod",
+      "cidr-block": "10.0.1.0/24",
+      "lifecycle-state": "AVAILABLE",
+      "prohibit-public-ip-on-vnic": false,
+      "prohibit-internet-ingress": false,
+      "is-flow-log-enabled": false,
+      "route-table-id": "ocid1.routetable.oc1..aaart001",
+      "security-list-ids": [
+        "ocid1.securitylist.oc1..aaaseclistdefault"
+      ],
+      "time-created": "2024-01-10T00:00:00Z"
+    },
+    {
+      "id": "ocid1.subnet.oc1..aaaprivate",
+      "display-name": "private-subnet-prod",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "vcn-id": "ocid1.vcn.oc1..aaavcnprod",
+      "cidr-block": "10.0.2.0/24",
+      "lifecycle-state": "AVAILABLE",
+      "prohibit-public-ip-on-vnic": true,
+      "prohibit-internet-ingress": true,
+      "is-flow-log-enabled": false,
+      "route-table-id": "ocid1.routetable.oc1..aaart002",
+      "security-list-ids": [
+        "ocid1.securitylist.oc1..aaaseclistbackend"
+      ],
+      "time-created": "2024-01-10T00:00:00Z"
+    },
+    {
+      "id": "ocid1.subnet.oc1..aaadev",
+      "display-name": "dev-subnet",
+      "compartment-id": "ocid1.compartment.oc1..aaadev",
+      "vcn-id": "ocid1.vcn.oc1..aaavcndev",
+      "cidr-block": "10.1.1.0/24",
+      "lifecycle-state": "AVAILABLE",
+      "prohibit-public-ip-on-vnic": true,
+      "prohibit-internet-ingress": true,
+      "is-flow-log-enabled": false,
+      "route-table-id": "ocid1.routetable.oc1..aaart003",
+      "security-list-ids": [
+        "ocid1.securitylist.oc1..aaaseclistdefault"
+      ],
+      "time-created": "2024-02-20T00:00:00Z"
+    }
+  ]
+}

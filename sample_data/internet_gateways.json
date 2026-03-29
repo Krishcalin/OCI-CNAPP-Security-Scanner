@@ -1,0 +1,10 @@
+{"data": [
+  {
+    "id": "ocid1.internetgateway.oc1..aaa1",
+    "display-name": "prod-igw",
+    "vcn-id": "ocid1.vcn.oc1..aaa1",
+    "lifecycle-state": "AVAILABLE",
+    "is-enabled": true,
+    "time-created": "2025-01-15T00:00:00Z"
+  }
+]}

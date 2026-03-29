@@ -1,0 +1,41 @@
+{
+  "data": [
+    {
+      "id": "ocid1.dbsystem.oc1..aaadbsys001",
+      "display-name": "legacy-oracle-db",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "availability-domain": "AD-1",
+      "shape": "VM.Standard2.4",
+      "lifecycle-state": "AVAILABLE",
+      "subnet-id": "ocid1.subnet.oc1..aaapublic",
+      "hostname": "legacydb",
+      "domain": "sub1.vcnprod.oraclevcn.com",
+      "database-edition": "ENTERPRISE_EDITION",
+      "db-version": "19.0.0.0",
+      "time-created": "2024-03-01T00:00:00Z",
+      "db-home": {
+        "id": "ocid1.dbhome.oc1..aaadbhome001",
+        "db-version": "19.0.0.0",
+        "display-name": "dbhome-legacy"
+      },
+      "data-storage-size-in-gbs": 512,
+      "license-model": "BRING_YOUR_OWN_LICENSE",
+      "node-count": 1,
+      "nsg-ids": [],
+      "backup-subnet-id": null,
+      "auto-backup-enabled": false,
+      "auto-backup-window": null,
+      "recovery-window-in-days": 7,
+      "last-patch-history-entry-id": null,
+      "maintenance-window": {
+        "preference": "NO_PREFERENCE"
+      },
+      "kms-key-id": "",
+      "cpu-core-count": 4,
+      "cluster-name": null,
+      "ssh-public-keys": [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAA..."
+      ]
+    }
+  ]
+}

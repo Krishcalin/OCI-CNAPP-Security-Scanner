@@ -1,0 +1,13 @@
+{"data": [
+  {
+    "id": "ocid1.cloudguardtarget.oc1..aaa1",
+    "display-name": "prod-target",
+    "lifecycle-state": "ACTIVE",
+    "target-resource-type": "COMPARTMENT",
+    "target-resource-id": "ocid1.compartment.oc1..aaaprod",
+    "target-detector-recipes": [
+      {"id": "ocid1.detectorrecipe.oc1..aaa1", "display-name": "OCI Config Detector"}
+    ],
+    "target-responder-recipes": []
+  }
+]}

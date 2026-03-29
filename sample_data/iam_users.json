@@ -1,0 +1,72 @@
+{
+  "data": [
+    {
+      "id": "ocid1.user.oc1..aaauseradmin",
+      "name": "admin_user",
+      "description": "Tenancy administrator",
+      "email": "admin@example.com",
+      "lifecycle-state": "ACTIVE",
+      "is-mfa-activated": false,
+      "time-created": "2024-03-10T08:00:00Z",
+      "compartment-id": "ocid1.tenancy.oc1..aaaaexample",
+      "capabilities": {
+        "can-use-console-password": true,
+        "can-use-api-keys": true,
+        "can-use-auth-tokens": true,
+        "can-use-smtp-credentials": true,
+        "can-use-customer-secret-keys": true
+      }
+    },
+    {
+      "id": "ocid1.user.oc1..aaauserdev",
+      "name": "dev_user",
+      "description": "Developer account",
+      "email": "dev@example.com",
+      "lifecycle-state": "ACTIVE",
+      "is-mfa-activated": false,
+      "time-created": "2024-06-15T10:30:00Z",
+      "compartment-id": "ocid1.tenancy.oc1..aaaaexample",
+      "capabilities": {
+        "can-use-console-password": true,
+        "can-use-api-keys": true,
+        "can-use-auth-tokens": true,
+        "can-use-smtp-credentials": false,
+        "can-use-customer-secret-keys": false
+      }
+    },
+    {
+      "id": "ocid1.user.oc1..aaauserservice",
+      "name": "service_acct",
+      "description": "Service account for CI/CD pipeline",
+      "email": "svc@example.com",
+      "lifecycle-state": "ACTIVE",
+      "is-mfa-activated": false,
+      "time-created": "2024-09-01T14:00:00Z",
+      "compartment-id": "ocid1.tenancy.oc1..aaaaexample",
+      "capabilities": {
+        "can-use-console-password": false,
+        "can-use-api-keys": true,
+        "can-use-auth-tokens": true,
+        "can-use-smtp-credentials": false,
+        "can-use-customer-secret-keys": true
+      }
+    },
+    {
+      "id": "ocid1.user.oc1..aaauserdisabled",
+      "name": "disabled_user",
+      "description": "Former employee - disabled",
+      "email": "former@example.com",
+      "lifecycle-state": "INACTIVE",
+      "is-mfa-activated": false,
+      "time-created": "2023-11-20T09:00:00Z",
+      "compartment-id": "ocid1.tenancy.oc1..aaaaexample",
+      "capabilities": {
+        "can-use-console-password": true,
+        "can-use-api-keys": true,
+        "can-use-auth-tokens": false,
+        "can-use-smtp-credentials": false,
+        "can-use-customer-secret-keys": false
+      }
+    }
+  ]
+}

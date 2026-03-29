@@ -1,0 +1,28 @@
+{
+  "data": [
+    {
+      "id": "ocid1.par.oc1..aaapar001",
+      "name": "public-assets-readonly-par",
+      "bucket-name": "public-assets",
+      "namespace": "example-namespace",
+      "access-type": "AnyObjectReadWrite",
+      "object-name": null,
+      "time-created": "2025-06-01T00:00:00Z",
+      "time-expires": "2027-12-31T00:00:00Z",
+      "lifecycle-state": "ACTIVE",
+      "access-uri": "/p/aaaBBBccc123/n/example-namespace/b/public-assets/o/"
+    },
+    {
+      "id": "ocid1.par.oc1..aaapar002",
+      "name": "app-data-upload-par",
+      "bucket-name": "app-data",
+      "namespace": "example-namespace",
+      "access-type": "AnyObjectReadWrite",
+      "object-name": null,
+      "time-created": "2025-08-15T00:00:00Z",
+      "time-expires": "2027-12-31T00:00:00Z",
+      "lifecycle-state": "ACTIVE",
+      "access-uri": "/p/dddEEEfff456/n/example-namespace/b/app-data/o/"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "data": [
+    {
+      "id": "ocid1.autonomousdatabase.oc1..aaadbanal",
+      "display-name": "analytics-db",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "db-name": "ANALYTICSDB",
+      "db-workload": "OLAP",
+      "lifecycle-state": "AVAILABLE",
+      "cpu-core-count": 2,
+      "data-storage-size-in-tbs": 1,
+      "is-auto-scaling-enabled": true,
+      "is-dedicated": false,
+      "is-free-tier": false,
+      "kms-key-id": "",
+      "is-access-control-enabled": false,
+      "whitelisted-ips": [],
+      "subnet-id": "ocid1.subnet.oc1..aaapublic",
+      "nsg-ids": [],
+      "private-endpoint": null,
+      "private-endpoint-label": null,
+      "connection-strings": {
+        "high": "adb.us-ashburn-1.oraclecloud.com:1522/analyticsdb_high.adb.oraclecloud.com",
+        "medium": "adb.us-ashburn-1.oraclecloud.com:1522/analyticsdb_medium.adb.oraclecloud.com",
+        "low": "adb.us-ashburn-1.oraclecloud.com:1522/analyticsdb_low.adb.oraclecloud.com"
+      },
+      "is-mtls-connection-required": false,
+      "time-created": "2024-07-01T00:00:00Z",
+      "db-version": "19c",
+      "is-data-guard-enabled": false,
+      "is-local-data-guard-enabled": false,
+      "backup-config": {
+        "manual-backup-bucket-name": null,
+        "manual-backup-type": null
+      }
+    },
+    {
+      "id": "ocid1.autonomousdatabase.oc1..aaadbreport",
+      "display-name": "reporting-db",
+      "compartment-id": "ocid1.compartment.oc1..aaaprod",
+      "db-name": "REPORTINGDB",
+      "db-workload": "OLAP",
+      "lifecycle-state": "AVAILABLE",
+      "cpu-core-count": 1,
+      "data-storage-size-in-tbs": 1,
+      "is-auto-scaling-enabled": false,
+      "is-dedicated": false,
+      "is-free-tier": false,
+      "kms-key-id": "",
+      "is-access-control-enabled": false,
+      "whitelisted-ips": [],
+      "subnet-id": "ocid1.subnet.oc1..aaapublic",
+      "nsg-ids": [],
+      "private-endpoint": null,
+      "private-endpoint-label": null,
+      "connection-strings": {
+        "high": "adb.us-ashburn-1.oraclecloud.com:1522/reportingdb_high.adb.oraclecloud.com",
+        "medium": "adb.us-ashburn-1.oraclecloud.com:1522/reportingdb_medium.adb.oraclecloud.com",
+        "low": "adb.us-ashburn-1.oraclecloud.com:1522/reportingdb_low.adb.oraclecloud.com"
+      },
+      "is-mtls-connection-required": false,
+      "time-created": "2024-08-15T00:00:00Z",
+      "db-version": "19c",
+      "is-data-guard-enabled": false,
+      "is-local-data-guard-enabled": false,
+      "backup-config": {
+        "manual-backup-bucket-name": null,
+        "manual-backup-type": null
+      }
+    }
+  ]
+}

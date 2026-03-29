@@ -1,0 +1,18 @@
+{"data": [
+  {
+    "id": "ocid1.vcn.oc1..aaa1",
+    "display-name": "prod-vcn",
+    "compartment-id": "ocid1.compartment.oc1..aaaprod",
+    "cidr-block": "10.0.0.0/16",
+    "lifecycle-state": "AVAILABLE",
+    "time-created": "2024-01-15T00:00:00Z"
+  },
+  {
+    "id": "ocid1.vcn.oc1..aaa2",
+    "display-name": "dev-vcn",
+    "compartment-id": "ocid1.compartment.oc1..aaadev",
+    "cidr-block": "10.1.0.0/16",
+    "lifecycle-state": "AVAILABLE",
+    "time-created": "2024-03-01T00:00:00Z"
+  }
+]}

@@ -1,0 +1,11 @@
+{
+  "data": {
+    "tenancy-id": "ocid1.tenancy.oc1..aaaaexample",
+    "tenancy-name": "example-corp",
+    "home-region": "us-ashburn-1",
+    "root-compartment-resources": [
+      "web-server-prod",
+      "legacy-db-instance"
+    ]
+  }
+}
