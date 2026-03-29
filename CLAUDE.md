@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-A Python-based Cloud-Native Application Protection Platform (CNAPP) scanner for Oracle Cloud Infrastructure. Performs offline security assessment by analyzing OCI CLI JSON configuration exports against the CIS Oracle Cloud Infrastructure Foundations Benchmark v2.0, OCI security best practices, and industry frameworks. Covers CSPM, CIEM, CWPP, KSPM, IaC, and CIS Benchmark compliance in a single tool.
+A Python-based Cloud-Native Application Protection Platform (CNAPP) scanner for Oracle Cloud Infrastructure. Performs offline security assessment by analyzing OCI CLI JSON configuration exports against the **CIS Oracle Cloud Infrastructure Foundations Benchmark v3.1.0** (~95% coverage), OCI security best practices, and industry frameworks. Covers CSPM, CIEM, CWPP, KSPM, IaC, and CIS Benchmark compliance in a single tool.
 
 **Repository**: https://github.com/Krishcalin/OCI-CNAPP-Security-Scanner
 **License**: MIT
@@ -25,7 +25,7 @@ OCI-CNAPP-Security-Scanner/
 │   │                              # WafEdgeAuditor, BastionAuditor,
 │   │                              # IacSecurityAuditor, CisBenchmarkAuditor
 │   └── report_generator.py        # ReportGenerator (HTML dashboard)
-├── sample_data/                    # 35 demo OCI config JSON exports
+├── sample_data/                    # 42 demo OCI config JSON exports
 ├── docs/
 │   └── banner.svg
 ├── LICENSE
@@ -91,16 +91,16 @@ Base class for all auditor modules. Provides:
   - Detailed findings with affected items
   - OCI branding
 
-## Module Inventory (13 modules, 76 checks)
+## Module Inventory (13 modules, 96 checks)
 
 | Module | Auditor Class | Check ID Prefix | Checks | Category |
 |--------|--------------|-----------------|--------|----------|
-| `iam` | `IamPolicyAuditor` | `OCI-IAM-` | 10 | CSPM |
-| `network` | `NetworkVcnAuditor` | `OCI-NET-` | 10 | CSPM |
+| `iam` | `IamPolicyAuditor` | `OCI-IAM-` | 20 | CSPM |
+| `network` | `NetworkVcnAuditor` | `OCI-NET-` | 12 | CSPM |
 | `compute` | `ComputeAuditor` | `OCI-COMP-` | 8 | CSPM |
-| `storage` | `StorageAuditor` | `OCI-STOR-` | 6 | CSPM |
+| `storage` | `StorageAuditor` | `OCI-STOR-` | 8 | CSPM |
 | `database` | `DatabaseAuditor` | `OCI-DB-` | 6 | CSPM |
-| `logging` | `LoggingAuditAuditor` | `OCI-LOG-` | 6 | CSPM |
+| `logging` | `LoggingAuditAuditor` | `OCI-LOG-` | 12 | CSPM |
 | `cloudguard` | `CloudGuardAuditor` | `OCI-CG-` | 5 | CSPM |
 | `oke` | `OkeSecurityAuditor` | `OCI-OKE-` | 8 | CWPP/KSPM |
 | `vault` | `VaultKmsAuditor` | `OCI-KMS-` | 5 | Encryption |
@@ -127,6 +127,7 @@ The `FILE_MAP` dict in `modules/base.py` maps logical data keys to candidate JSO
 | WAF & LB | `waf_policies`, `load_balancers` | `waf_policies.json`, `load_balancers.json` |
 | Bastion | `bastions`, `bastion_sessions` | `bastions.json`, `bastion_sessions.json` |
 | IaC | `terraform_state`, `terraform_plan` | `terraform.tfstate`, `terraform_plan.json` |
+| CIS v3.1.0 | `customer_secret_keys`, `tag_defaults`, `notification_topics`, `block_volumes`, `file_systems` | `customer_secret_keys.json`, `tag_defaults.json`, `notification_topics.json`, `block_volumes.json`, `file_systems.json` |
 
 ## CLI Reference
 

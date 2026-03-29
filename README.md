@@ -10,16 +10,16 @@
   <img src="https://img.shields.io/badge/python-3.8%2B-blue?style=flat-square&logo=python&logoColor=white"/>
   <img src="https://img.shields.io/badge/dependencies-zero-brightgreen?style=flat-square"/>
   <img src="https://img.shields.io/badge/license-MIT-orange?style=flat-square"/>
-  <img src="https://img.shields.io/badge/checks-76-c74634?style=flat-square"/>
+  <img src="https://img.shields.io/badge/checks-96-c74634?style=flat-square"/>
   <img src="https://img.shields.io/badge/CNAPP-CSPM%20%2B%20CIEM%20%2B%20CWPP%20%2B%20KSPM%20%2B%20IaC-blue?style=flat-square"/>
-  <img src="https://img.shields.io/badge/CIS_OCI_Foundation-v2.0-c74634?style=flat-square"/>
+  <img src="https://img.shields.io/badge/CIS_OCI_Foundation-v3.1.0-c74634?style=flat-square"/>
 </p>
 
 ---
 
 ## Overview
 
-**OCI CNAPP Security Scanner** is a comprehensive offline security assessment tool that implements a modern Cloud-Native Application Protection Platform (CNAPP) -- combining CSPM, CIEM, CWPP, KSPM, and IaC security scanning into one unified scanner for Oracle Cloud Infrastructure. It analyzes OCI configuration exports (JSON from the `oci` CLI) against the CIS Oracle Cloud Infrastructure Foundations Benchmark v2.0, OCI security best practices, and industry frameworks.
+**OCI CNAPP Security Scanner** is a comprehensive offline security assessment tool that implements a modern Cloud-Native Application Protection Platform (CNAPP) -- combining CSPM, CIEM, CWPP, KSPM, and IaC security scanning into one unified scanner for Oracle Cloud Infrastructure. It analyzes OCI configuration exports (JSON from the `oci` CLI) against the **CIS Oracle Cloud Infrastructure Foundations Benchmark v3.1.0**, OCI security best practices, and industry frameworks.
 
 ### What is CNAPP?
 
@@ -33,14 +33,14 @@ A Cloud-Native Application Protection Platform (CNAPP) -- as defined by Gartner 
 | **KSPM** | Kubernetes Security Posture Management | OKE cluster configuration, RBAC, network policy |
 | **IaC** | Infrastructure as Code Security | Terraform state and plan misconfigurations |
 
-This scanner covers **all five pillars** with 76 checks across 13 modules -- zero external dependencies, pure Python 3.8+ stdlib.
+This scanner covers **all five pillars** with 96 checks across 13 modules -- zero external dependencies, pure Python 3.8+ stdlib.
 
 ---
 
 ## Features
 
-- **76 security checks** across 13 specialized modules
-- **CIS OCI Foundations Benchmark v2.0** mapping for 40+ checks
+- **96 security checks** across 13 specialized modules
+- **CIS OCI Foundations Benchmark v3.1.0** mapping (~95% coverage, 45+ checks)
 - **Offline analysis** -- reads JSON exports, never connects to live OCI environments
 - **Interactive HTML dashboard** with severity breakdown and detailed findings
 - **Zero dependencies** -- Python 3.8+ standard library only
@@ -73,10 +73,10 @@ python oci_scanner.py --data-dir ./exports --modules vault waf bastion
 
 ## CNAPP Modules (13)
 
-### CSPM -- Cloud Security Posture Management (7 modules, 51 checks)
+### CSPM -- Cloud Security Posture Management (7 modules, 71 checks)
 
 <details>
-<summary><strong>Module 1: IAM & Policies</strong> -- 10 checks (CIS 1.x)</summary>
+<summary><strong>Module 1: IAM & Policies</strong> -- 20 checks (CIS 1.x)</summary>
 
 | Check ID | Title | Severity | CIS |
 |----------|-------|----------|-----|
