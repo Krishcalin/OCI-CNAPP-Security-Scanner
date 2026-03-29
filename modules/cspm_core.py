@@ -6,7 +6,7 @@ from .base import BaseAuditor
 
 
 class IamPolicyAuditor(BaseAuditor):
-    """OCI IAM & Policy security checks (10 checks, OCI-IAM-001 to OCI-IAM-010)."""
+    """OCI IAM & Policy security checks (20 checks, OCI-IAM-001 to OCI-IAM-020)."""
 
     def run_all_checks(self) -> List[Dict]:
         self.check_root_compartment_resources()
@@ -19,6 +19,16 @@ class IamPolicyAuditor(BaseAuditor):
         self.check_admin_group_size()
         self.check_tenancy_wide_policies()
         self.check_password_policy()
+        self.check_admin_group_protection()
+        self.check_password_expiry()
+        self.check_password_reuse()
+        self.check_secret_key_rotation()
+        self.check_admin_api_keys()
+        self.check_user_email()
+        self.check_instance_principal()
+        self.check_storage_admin_delete()
+        self.check_credentials_unused()
+        self.check_multiple_api_keys()
         return self.findings
 
     def check_root_compartment_resources(self):
@@ -250,9 +260,260 @@ class IamPolicyAuditor(BaseAuditor):
                     remed="Update password policy: minimum 14 characters, require uppercase, lowercase, numeric, and special characters.",
                     refs=["CIS OCI 1.5"], cis="1.5")
 
+    # ── CIS OCI v3.1.0 IAM additions (OCI-IAM-011 to OCI-IAM-020) ──
+
+    def check_admin_group_protection(self):
+        """OCI-IAM-011 (CIS 1.3): IAM admins cannot update Administrators group."""
+        policies = self._unwrap("iam_policies")
+        if not policies: return
+        unsafe = []
+        for p in policies:
+            name = p.get("name", p.get("display-name", ""))
+            stmts = p.get("statements", [])
+            for s in stmts:
+                sl = s.lower() if isinstance(s, str) else ""
+                if ("use users in tenancy" in sl or "use groups in tenancy" in sl):
+                    if "where target.group.name != 'administrators'" not in sl.replace('"', "'"):
+                        unsafe.append(f"{name}: {s[:120]}")
+        if unsafe:
+            self.finding("OCI-IAM-011", "IAM admins can update Administrators group", self.SEVERITY_HIGH,
+                "IAM & Policies",
+                f"{len(unsafe)} policy statement(s) allow user/group management without excluding the Administrators group.",
+                items=unsafe[:20],
+                remed="Add condition \"where target.group.name != 'Administrators'\" to policies granting 'use users' or 'use groups' in tenancy.",
+                refs=["CIS OCI 1.3"], cis="1.3")
+
+    def check_password_expiry(self):
+        """OCI-IAM-012 (CIS 1.5): Password policy expires within 365 days."""
+        pp = self.data.get("password_policy")
+        if not pp: return
+        d = pp.get("data", pp) if isinstance(pp, dict) else pp
+        if not isinstance(d, dict): return
+        pwd = d.get("password-policy", d.get("passwordPolicy", d))
+        if not isinstance(pwd, dict): return
+        expires = pwd.get("expires-after-days", pwd.get("expiresAfterDays",
+                 pwd.get("password-expiration-days", pwd.get("passwordExpirationDays", None))))
+        if expires is None:
+            self.finding("OCI-IAM-012", "Password expiration not configured", self.SEVERITY_MEDIUM,
+                "IAM & Policies",
+                "Password expiration is not configured. Passwords should expire within 365 days.",
+                items=["No expiration policy set"],
+                remed="Configure password expiration to 365 days or less under Identity > Authentication Settings.",
+                refs=["CIS OCI 1.5"], cis="1.5")
+        elif expires > 365:
+            self.finding("OCI-IAM-012", "Password expiration exceeds 365 days", self.SEVERITY_MEDIUM,
+                "IAM & Policies",
+                f"Password expiration is set to {expires} days, which exceeds the 365-day CIS recommendation.",
+                items=[f"Current expiration: {expires} days (recommended: <= 365)"],
+                remed="Reduce password expiration to 365 days or less under Identity > Authentication Settings.",
+                refs=["CIS OCI 1.5"], cis="1.5")
+
+    def check_password_reuse(self):
+        """OCI-IAM-013 (CIS 1.6): Password policy prevents reuse (>= 24)."""
+        pp = self.data.get("password_policy")
+        if not pp: return
+        d = pp.get("data", pp) if isinstance(pp, dict) else pp
+        if not isinstance(d, dict): return
+        pwd = d.get("password-policy", d.get("passwordPolicy", d))
+        if not isinstance(pwd, dict): return
+        remembered = pwd.get("previous-passwords-remembered", pwd.get("previousPasswordsRemembered",
+                    pwd.get("num-previous-passwords-blocked", pwd.get("numPreviousPasswordsBlocked", 0))))
+        if remembered < 24:
+            self.finding("OCI-IAM-013", "Password reuse prevention insufficient", self.SEVERITY_MEDIUM,
+                "IAM & Policies",
+                f"Password policy remembers {remembered} previous passwords. CIS requires at least 24 to prevent reuse.",
+                items=[f"Current: {remembered} passwords remembered (recommended: >= 24)"],
+                remed="Set 'previous passwords remembered' to at least 24 under Identity > Authentication Settings.",
+                refs=["CIS OCI 1.6"], cis="1.6")
+
+    def check_secret_key_rotation(self):
+        """OCI-IAM-014 (CIS 1.9): Customer secret keys rotate every 90 days."""
+        keys = self._unwrap("customer_secret_keys")
+        if not keys: return
+        old_keys = []
+        now = datetime.now(timezone.utc)
+        for k in keys:
+            state = k.get("lifecycle-state", k.get("lifecycleState", ""))
+            if state != "ACTIVE": continue
+            created = k.get("time-created", k.get("timeCreated", ""))
+            if not created: continue
+            try:
+                ct = datetime.fromisoformat(created.replace("Z", "+00:00"))
+                age = (now - ct).days
+                if age > 90:
+                    uid = k.get("user-id", k.get("userId", ""))[:30]
+                    desc = k.get("display-name", k.get("displayName", k.get("id", "")))[:30]
+                    old_keys.append(f"user={uid}... key={desc} ({age} days)")
+            except (ValueError, TypeError):
+                pass
+        if old_keys:
+            self.finding("OCI-IAM-014", "Customer secret keys older than 90 days", self.SEVERITY_HIGH,
+                "IAM & Policies",
+                f"{len(old_keys)} customer secret key(s) exceed the 90-day rotation threshold.",
+                items=old_keys[:20],
+                remed="Rotate customer secret keys every 90 days. Generate a new key and deactivate the old one.",
+                refs=["CIS OCI 1.9"], cis="1.9")
+
+    def check_admin_api_keys(self):
+        """OCI-IAM-015 (CIS 1.12): API keys not created for tenancy admin users."""
+        keys = self._unwrap("iam_api_keys")
+        groups = self._unwrap("iam_groups")
+        if not keys or not groups: return
+        # Build set of user IDs in admin groups
+        admin_user_ids = set()
+        for g in groups:
+            gname = g.get("name", g.get("display-name", "")).lower()
+            if "admin" not in gname: continue
+            members = g.get("members", g.get("user-ids", []))
+            if isinstance(members, list):
+                for m in members:
+                    if isinstance(m, dict):
+                        admin_user_ids.add(m.get("user-id", m.get("userId", "")))
+                    else:
+                        admin_user_ids.add(str(m))
+        admin_with_keys = []
+        seen = set()
+        for k in keys:
+            state = k.get("lifecycle-state", k.get("lifecycleState", ""))
+            if state != "ACTIVE": continue
+            uid = k.get("user-id", k.get("userId", ""))
+            if uid in admin_user_ids and uid not in seen:
+                seen.add(uid)
+                fp = k.get("fingerprint", k.get("key-id", ""))[:20]
+                admin_with_keys.append(f"admin user={uid[:30]}... key={fp}...")
+        if admin_with_keys:
+            self.finding("OCI-IAM-015", "API keys on tenancy admin users", self.SEVERITY_HIGH,
+                "IAM & Policies",
+                f"{len(admin_with_keys)} tenancy admin user(s) have API keys. Admin users should use console or federation, not API keys.",
+                items=admin_with_keys[:20],
+                remed="Remove API keys from admin users. Use federation/SSO for admin access and Instance Principals for automation.",
+                refs=["CIS OCI 1.12"], cis="1.12")
+
+    def check_user_email(self):
+        """OCI-IAM-016 (CIS 1.13): All IAM users have valid email."""
+        users = self._unwrap("iam_users")
+        if not users: return
+        no_email = []
+        for u in users:
+            state = u.get("lifecycle-state", u.get("lifecycleState", ""))
+            if state != "ACTIVE": continue
+            email = u.get("email", u.get("emailAddress", ""))
+            if not email or not email.strip():
+                name = u.get("name", u.get("description", u.get("id", "")[:30]))
+                no_email.append(name)
+        if no_email:
+            self.finding("OCI-IAM-016", "IAM users without valid email", self.SEVERITY_MEDIUM,
+                "IAM & Policies",
+                f"{len(no_email)} active IAM user(s) do not have a valid email address configured.",
+                items=no_email[:20],
+                remed="Set a valid email address for all IAM users for password recovery and security notifications.",
+                refs=["CIS OCI 1.13"], cis="1.13")
+
+    def check_instance_principal(self):
+        """OCI-IAM-017 (CIS 1.14): Instance Principal authentication used."""
+        policies = self._unwrap("iam_policies")
+        instances = self._unwrap("instances")
+        has_instance_principal = False
+        for p in policies:
+            stmts = p.get("statements", [])
+            for s in stmts:
+                sl = s.lower() if isinstance(s, str) else ""
+                if "request.principal" in sl or "dynamic-group" in sl:
+                    has_instance_principal = True
+                    break
+            if has_instance_principal: break
+        running = [i for i in instances
+                   if i.get("lifecycle-state", i.get("lifecycleState", "")) == "RUNNING"]
+        if not has_instance_principal and running:
+            self.finding("OCI-IAM-017", "Instance Principal not used", self.SEVERITY_MEDIUM,
+                "IAM & Policies",
+                f"{len(running)} running instance(s) found but no Instance Principal (dynamic group) policies detected. "
+                "Instances may be using stored credentials instead of Instance Principal for OCI API access.",
+                items=[i.get("display-name", i.get("displayName", "")) for i in running[:20]],
+                remed="Create dynamic groups and policies for Instance Principal authentication. Remove stored API keys from instances.",
+                refs=["CIS OCI 1.14"], cis="1.14")
+
+    def check_storage_admin_delete(self):
+        """OCI-IAM-018 (CIS 1.15): Storage admins cannot delete resources."""
+        policies = self._unwrap("iam_policies")
+        if not policies: return
+        unsafe = []
+        for p in policies:
+            name = p.get("name", p.get("display-name", ""))
+            stmts = p.get("statements", [])
+            for s in stmts:
+                sl = s.lower() if isinstance(s, str) else ""
+                if ("manage object-family" in sl or "manage buckets" in sl or
+                        "manage objects" in sl or "manage volumes" in sl or
+                        "manage file-family" in sl):
+                    if "request.permission!=" not in sl.replace(" ", "") or "*_delete" not in sl.lower():
+                        unsafe.append(f"{name}: {s[:120]}")
+        if unsafe:
+            self.finding("OCI-IAM-018", "Storage admins can delete resources", self.SEVERITY_MEDIUM,
+                "IAM & Policies",
+                f"{len(unsafe)} policy statement(s) grant storage management without restricting delete permissions.",
+                items=unsafe[:20],
+                remed="Add condition \"where request.permission != '*_DELETE'\" to storage admin policies to prevent accidental or malicious deletion.",
+                refs=["CIS OCI 1.15"], cis="1.15")
+
+    def check_credentials_unused(self):
+        """OCI-IAM-019 (CIS 1.16): Credentials unused 45+ days disabled."""
+        users = self._unwrap("iam_users")
+        if not users: return
+        stale = []
+        now = datetime.now(timezone.utc)
+        for u in users:
+            state = u.get("lifecycle-state", u.get("lifecycleState", ""))
+            if state != "ACTIVE": continue
+            name = u.get("name", u.get("description", u.get("id", "")[:30]))
+            # Check last successful login
+            last_login = u.get("last-successful-login-time", u.get("lastSuccessfulLoginTime", ""))
+            created = u.get("time-created", u.get("timeCreated", ""))
+            reference_date = last_login or created
+            if not reference_date: continue
+            try:
+                ref_dt = datetime.fromisoformat(reference_date.replace("Z", "+00:00"))
+                idle_days = (now - ref_dt).days
+                if idle_days > 45:
+                    stale.append(f"{name}: idle {idle_days} days (last activity: {reference_date[:10]})")
+            except (ValueError, TypeError):
+                pass
+        if stale:
+            self.finding("OCI-IAM-019", "Credentials unused for 45+ days", self.SEVERITY_HIGH,
+                "IAM & Policies",
+                f"{len(stale)} active IAM user(s) have not logged in for over 45 days. Stale credentials increase attack surface.",
+                items=stale[:20],
+                remed="Disable or remove IAM users who have not logged in for 45+ days. Implement an automated credential lifecycle policy.",
+                refs=["CIS OCI 1.16"], cis="1.16")
+
+    def check_multiple_api_keys(self):
+        """OCI-IAM-020 (CIS 1.17): Only one active API key per user."""
+        keys = self._unwrap("iam_api_keys")
+        if not keys: return
+        from collections import defaultdict
+        user_keys = defaultdict(list)
+        for k in keys:
+            state = k.get("lifecycle-state", k.get("lifecycleState", ""))
+            if state != "ACTIVE": continue
+            uid = k.get("user-id", k.get("userId", ""))
+            fp = k.get("fingerprint", k.get("key-id", ""))[:20]
+            if uid:
+                user_keys[uid].append(fp)
+        multi = []
+        for uid, fps in user_keys.items():
+            if len(fps) > 1:
+                multi.append(f"user={uid[:30]}...: {len(fps)} active keys")
+        if multi:
+            self.finding("OCI-IAM-020", "Multiple active API keys per user", self.SEVERITY_MEDIUM,
+                "IAM & Policies",
+                f"{len(multi)} user(s) have more than one active API key. Each user should have only one active key to simplify rotation.",
+                items=multi[:20],
+                remed="Remove redundant API keys. Maintain only one active API key per user and rotate regularly.",
+                refs=["CIS OCI 1.17"], cis="1.17")
+
 
 class NetworkVcnAuditor(BaseAuditor):
-    """OCI Networking & VCN security checks (10 checks, OCI-NET-001 to OCI-NET-010)."""
+    """OCI Networking & VCN security checks (12 checks, OCI-NET-001 to OCI-NET-012)."""
 
     def run_all_checks(self) -> List[Dict]:
         self.check_default_security_list_egress()
@@ -265,6 +526,8 @@ class NetworkVcnAuditor(BaseAuditor):
         self.check_route_tables()
         self.check_service_gateway()
         self.check_icmp_unrestricted()
+        self.check_nsg_ssh_open()
+        self.check_nsg_rdp_open()
         return self.findings
 
     def _get_security_rules(self):
@@ -486,6 +749,82 @@ class NetworkVcnAuditor(BaseAuditor):
                 items=exposed[:20],
                 remed="Restrict ICMP to specific source CIDRs and ICMP types (e.g., type 3 code 4 for path MTU discovery).")
 
+    # ── CIS OCI v3.1.0 NSG additions (OCI-NET-011 to OCI-NET-012) ──
+
+    def _collect_nsg_ingress_rules(self):
+        """Collect all NSG ingress rules from both NSG objects and standalone rules."""
+        nsgs = self._unwrap("network_security_groups")
+        nsg_rules = self._unwrap("nsg_rules")
+        rules = []
+        # Build NSG name lookup
+        nsg_names = {}
+        for nsg in nsgs:
+            nsg_id = nsg.get("id", "")
+            nsg_names[nsg_id] = nsg.get("display-name", nsg.get("displayName", nsg_id[:30]))
+            for rule in nsg.get("rules", nsg.get("security-rules", [])):
+                direction = rule.get("direction", "").upper()
+                if direction == "INGRESS":
+                    rules.append((nsg_names[nsg_id], rule))
+        for rule in nsg_rules:
+            direction = rule.get("direction", "").upper()
+            if direction == "INGRESS":
+                nsg_id = rule.get("network-security-group-id", rule.get("networkSecurityGroupId", ""))
+                name = nsg_names.get(nsg_id, nsg_id[:30])
+                rules.append((name, rule))
+        return rules
+
+    def check_nsg_ssh_open(self):
+        """OCI-NET-011 (CIS 2.3): NSG ingress from 0.0.0.0/0 to port 22."""
+        ingress = self._collect_nsg_ingress_rules()
+        if not ingress: return
+        exposed = []
+        for nsg_name, rule in ingress:
+            src = rule.get("source", "")
+            proto = str(rule.get("protocol", ""))
+            if src not in ("0.0.0.0/0", "::/0"): continue
+            if proto == "6":  # TCP
+                tcp = rule.get("tcp-options", rule.get("tcpOptions", {})) or {}
+                dport = tcp.get("destination-port-range", tcp.get("destinationPortRange", {})) or {}
+                mn = dport.get("min", 0)
+                mx = dport.get("max", 0)
+                if mn <= 22 <= mx:
+                    exposed.append(f"NSG '{nsg_name}': SSH (port 22) from {src}")
+            elif proto == "all":
+                exposed.append(f"NSG '{nsg_name}': all protocols (incl. SSH) from {src}")
+        if exposed:
+            self.finding("OCI-NET-011", "NSG allows SSH from 0.0.0.0/0", self.SEVERITY_CRITICAL,
+                "Networking & VCN",
+                f"{len(exposed)} NSG rule(s) allow SSH (TCP/22) ingress from any source IP.",
+                items=exposed[:20],
+                remed="Restrict NSG SSH rules to specific CIDR blocks. Use OCI Bastion service for secure remote access.",
+                refs=["CIS OCI 2.3"], cis="2.3")
+
+    def check_nsg_rdp_open(self):
+        """OCI-NET-012 (CIS 2.4): NSG ingress from 0.0.0.0/0 to port 3389."""
+        ingress = self._collect_nsg_ingress_rules()
+        if not ingress: return
+        exposed = []
+        for nsg_name, rule in ingress:
+            src = rule.get("source", "")
+            proto = str(rule.get("protocol", ""))
+            if src not in ("0.0.0.0/0", "::/0"): continue
+            if proto == "6":  # TCP
+                tcp = rule.get("tcp-options", rule.get("tcpOptions", {})) or {}
+                dport = tcp.get("destination-port-range", tcp.get("destinationPortRange", {})) or {}
+                mn = dport.get("min", 0)
+                mx = dport.get("max", 0)
+                if mn <= 3389 <= mx:
+                    exposed.append(f"NSG '{nsg_name}': RDP (port 3389) from {src}")
+            elif proto == "all":
+                exposed.append(f"NSG '{nsg_name}': all protocols (incl. RDP) from {src}")
+        if exposed:
+            self.finding("OCI-NET-012", "NSG allows RDP from 0.0.0.0/0", self.SEVERITY_CRITICAL,
+                "Networking & VCN",
+                f"{len(exposed)} NSG rule(s) allow RDP (TCP/3389) ingress from any source IP.",
+                items=exposed[:20],
+                remed="Restrict NSG RDP rules to specific CIDR blocks or disable RDP entirely. Use Bastion service for remote access.",
+                refs=["CIS OCI 2.4"], cis="2.4")
+
 
 class ComputeAuditor(BaseAuditor):
     """OCI Compute security checks (8 checks, OCI-COMP-001 to OCI-COMP-008)."""
@@ -678,7 +1017,7 @@ class ComputeAuditor(BaseAuditor):
 
 
 class StorageAuditor(BaseAuditor):
-    """OCI Object Storage security checks (6 checks, OCI-STOR-001 to OCI-STOR-006)."""
+    """OCI Object Storage security checks (8 checks, OCI-STOR-001 to OCI-STOR-008)."""
 
     def run_all_checks(self) -> List[Dict]:
         self.check_public_buckets()
@@ -687,6 +1026,8 @@ class StorageAuditor(BaseAuditor):
         self.check_cmek()
         self.check_preauthenticated_requests()
         self.check_replication()
+        self.check_block_volume_cmk()
+        self.check_file_storage_cmk()
         return self.findings
 
     def _buckets(self):
@@ -795,3 +1136,45 @@ class StorageAuditor(BaseAuditor):
                 f"{len(no_rep)} bucket(s) do not have cross-region replication enabled for disaster recovery.",
                 items=no_rep[:10],
                 remed="Enable replication on buckets containing critical data for cross-region disaster recovery.")
+
+    # ── CIS OCI v3.1.0 Storage additions (OCI-STOR-007 to OCI-STOR-008) ──
+
+    def check_block_volume_cmk(self):
+        """OCI-STOR-007 (CIS 5.2.1): Block volumes encrypted with CMK."""
+        volumes = self._unwrap("block_volumes")
+        if not volumes: return
+        no_cmk = []
+        for v in volumes:
+            state = v.get("lifecycle-state", v.get("lifecycleState", ""))
+            if state != "AVAILABLE": continue
+            kms = v.get("kms-key-id", v.get("kmsKeyId", ""))
+            if not kms:
+                name = v.get("display-name", v.get("displayName", ""))
+                no_cmk.append(name)
+        if no_cmk:
+            self.finding("OCI-STOR-007", "Block volumes without customer-managed keys", self.SEVERITY_MEDIUM,
+                "Object Storage",
+                f"{len(no_cmk)} block volume(s) use Oracle-managed encryption instead of customer-managed keys (CMK).",
+                items=no_cmk[:20],
+                remed="Assign a Vault master encryption key (CMK) to each block volume for customer-managed encryption.",
+                refs=["CIS OCI 5.2.1"], cis="5.2.1")
+
+    def check_file_storage_cmk(self):
+        """OCI-STOR-008 (CIS 5.3.1): File storage encrypted with CMK."""
+        filesystems = self._unwrap("file_systems")
+        if not filesystems: return
+        no_cmk = []
+        for fs in filesystems:
+            state = fs.get("lifecycle-state", fs.get("lifecycleState", ""))
+            if state != "ACTIVE": continue
+            kms = fs.get("kms-key-id", fs.get("kmsKeyId", ""))
+            if not kms:
+                name = fs.get("display-name", fs.get("displayName", ""))
+                no_cmk.append(name)
+        if no_cmk:
+            self.finding("OCI-STOR-008", "File storage without customer-managed keys", self.SEVERITY_MEDIUM,
+                "Object Storage",
+                f"{len(no_cmk)} file system(s) use Oracle-managed encryption instead of customer-managed keys (CMK).",
+                items=no_cmk[:20],
+                remed="Assign a Vault master encryption key (CMK) to each file system for customer-managed encryption.",
+                refs=["CIS OCI 5.3.1"], cis="5.3.1")

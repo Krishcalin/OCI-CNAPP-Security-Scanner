@@ -1,0 +1,10 @@
+{"data": [
+  {
+    "id": "ocid1.tagdefault.oc1..aaa1",
+    "tag-definition-name": "Department",
+    "value": "IT",
+    "lifecycle-state": "ACTIVE",
+    "compartment-id": "ocid1.tenancy.oc1..aaaaexample",
+    "time-created": "2024-01-15T00:00:00Z"
+  }
+]}

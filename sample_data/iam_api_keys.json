@@ -23,6 +23,14 @@
       "lifecycle-state": "INACTIVE",
       "time-created": "2024-06-01T00:00:00Z",
       "fingerprint": "ef:12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd"
+    },
+    {
+      "key-id": "ocid1.apikey.oc1..aaaapikey004",
+      "key-value": "dd:ee:ff:00:11:22:33:44:55:66:77:88:99:aa:bb:cc",
+      "user-id": "ocid1.user.oc1..aaauseradmin",
+      "lifecycle-state": "ACTIVE",
+      "time-created": "2025-06-01T00:00:00Z",
+      "fingerprint": "34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12"
     }
   ]
 }

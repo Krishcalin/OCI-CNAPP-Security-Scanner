@@ -67,6 +67,16 @@
         "can-use-smtp-credentials": false,
         "can-use-customer-secret-keys": false
       }
+    },
+    {
+      "id": "ocid1.user.oc1..aaausernoemail",
+      "name": "contractor_user",
+      "description": "External contractor without email",
+      "email": "",
+      "lifecycle-state": "ACTIVE",
+      "is-mfa-activated": false,
+      "time-created": "2025-08-01T00:00:00Z",
+      "compartment-id": "ocid1.tenancy.oc1..aaaaexample"
     }
   ]
 }

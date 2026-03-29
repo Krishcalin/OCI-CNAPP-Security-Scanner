@@ -38,6 +38,20 @@
         "Allow group Administrators to manage vaults in tenancy",
         "Allow service objectstorage-us-ashburn-1 to use keys in tenancy"
       ]
+    },
+    {
+      "id": "ocid1.policy.oc1..aaapolicyiam",
+      "name": "IAMAdminPolicy",
+      "description": "IAM admin access without Administrators group exclusion",
+      "compartment-id": "ocid1.tenancy.oc1..aaaaexample",
+      "lifecycle-state": "ACTIVE",
+      "time-created": "2024-05-01T00:00:00Z",
+      "statements": [
+        "Allow group IAMAdmins to use users in tenancy",
+        "Allow group IAMAdmins to use groups in tenancy",
+        "Allow group StorageAdmins to manage volumes in tenancy",
+        "Allow group StorageAdmins to manage buckets in tenancy"
+      ]
     }
   ]
 }

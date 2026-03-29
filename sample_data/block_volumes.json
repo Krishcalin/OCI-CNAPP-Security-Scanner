@@ -1,0 +1,20 @@
+{"data": [
+  {
+    "id": "ocid1.volume.oc1..aaa1",
+    "display-name": "data-vol-01",
+    "compartment-id": "ocid1.compartment.oc1..aaaprod",
+    "lifecycle-state": "AVAILABLE",
+    "size-in-gbs": 256,
+    "kms-key-id": "",
+    "time-created": "2024-06-01T00:00:00Z"
+  },
+  {
+    "id": "ocid1.volume.oc1..aaa2",
+    "display-name": "app-vol-01",
+    "compartment-id": "ocid1.compartment.oc1..aaaprod",
+    "lifecycle-state": "AVAILABLE",
+    "size-in-gbs": 512,
+    "kms-key-id": "",
+    "time-created": "2024-08-15T00:00:00Z"
+  }
+]}

@@ -8,6 +8,7 @@
       "compartment-id": "ocid1.tenancy.oc1..aaaaexample",
       "time-created": "2024-01-01T00:00:00Z",
       "members": [
+        "ocid1.user.oc1..aaauseradmin",
         "ocid1.user.oc1..aaaunknown001",
         "ocid1.user.oc1..aaaunknown002",
         "ocid1.user.oc1..aaaunknown003",

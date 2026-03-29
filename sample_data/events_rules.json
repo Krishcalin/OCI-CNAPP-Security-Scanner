@@ -1,0 +1,10 @@
+{"data": [
+  {
+    "id": "ocid1.eventrule.oc1..aaa1",
+    "display-name": "iam-group-changes",
+    "lifecycle-state": "ACTIVE",
+    "is-enabled": true,
+    "condition": "{\"eventType\":[\"com.oraclecloud.identitycontrolplane.creategroup\",\"com.oraclecloud.identitycontrolplane.deletegroup\",\"com.oraclecloud.identitycontrolplane.updategroup\"],\"data\":{}}",
+    "time-created": "2024-06-01T00:00:00Z"
+  }
+]}

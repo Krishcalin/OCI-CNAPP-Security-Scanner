@@ -82,6 +82,12 @@ FILE_MAP={
     # IaC
     "terraform_state":        ["terraform.tfstate","terraform_state.json"],
     "terraform_plan":         ["terraform_plan.json","tfplan.json"],
+    # CIS v3.1.0 additions
+    "customer_secret_keys":   ["customer_secret_keys.json","secret_keys.json"],
+    "tag_defaults":           ["tag_defaults.json"],
+    "notification_topics":    ["notification_topics.json","topics.json"],
+    "block_volumes":          ["block_volumes.json","volumes.json"],
+    "file_systems":           ["file_systems.json","file_storage.json"],
 }
 
 class DataLoader:

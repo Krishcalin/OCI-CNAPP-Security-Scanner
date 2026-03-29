@@ -161,7 +161,7 @@ class DatabaseAuditor(BaseAuditor):
 
 
 class LoggingAuditAuditor(BaseAuditor):
-    """OCI Logging & Audit checks (6 checks, OCI-LOG-001 to OCI-LOG-006)."""
+    """OCI Logging & Audit checks (12 checks, OCI-LOG-001 to OCI-LOG-012)."""
 
     def run_all_checks(self) -> List[Dict]:
         self.check_audit_retention()
@@ -170,6 +170,12 @@ class LoggingAuditAuditor(BaseAuditor):
         self.check_events_rules()
         self.check_alarms()
         self.check_log_groups()
+        self.check_default_tags()
+        self.check_notification_topic()
+        self.check_iam_vcn_event_rules()
+        self.check_cloud_guard_notification()
+        self.check_object_storage_write_logs()
+        self.check_local_user_auth_notification()
         return self.findings
 
     def check_audit_retention(self):
@@ -294,6 +300,220 @@ class LoggingAuditAuditor(BaseAuditor):
                 "Logging & Audit",
                 "All logs are in the default log group. Organizing logs into purpose-specific groups improves manageability.",
                 remed="Create dedicated log groups for different services/environments (e.g., audit-logs, vcn-flow-logs, application-logs).")
+
+    # ── CIS OCI v3.1.0 Logging additions (OCI-LOG-007 to OCI-LOG-012) ──
+
+    def check_default_tags(self):
+        """OCI-LOG-007 (CIS 4.1): Default tags on resources."""
+        tags = self._unwrap("tag_defaults")
+        if not tags:
+            self.finding("OCI-LOG-007", "Default tags not configured", self.SEVERITY_MEDIUM,
+                "Logging & Audit",
+                "No default tag rules found. Default tags should include the creator (iam.principal.name) for resource accountability.",
+                remed="Create a default tag rule with value '${iam.principal.name}' to automatically tag resources with their creator.",
+                refs=["CIS OCI 4.1"], cis="4.1")
+            return
+        has_principal_tag = False
+        for t in tags:
+            val = t.get("value", t.get("default-value", t.get("defaultValue", "")))
+            if isinstance(val, str) and "${iam.principal.name}" in val.lower():
+                has_principal_tag = True
+                break
+        if not has_principal_tag:
+            self.finding("OCI-LOG-007", "Default tags missing creator identity", self.SEVERITY_MEDIUM,
+                "Logging & Audit",
+                "Default tags exist but none include '${iam.principal.name}' for creator tracking.",
+                items=[f"Tag: {t.get('tag-definition-name', t.get('tagDefinitionName', ''))}: {t.get('value', '')}"
+                       for t in tags[:10]],
+                remed="Add a default tag rule with value '${iam.principal.name}' to track who created each resource.",
+                refs=["CIS OCI 4.1"], cis="4.1")
+
+    def check_notification_topic(self):
+        """OCI-LOG-008 (CIS 4.2): Notification topic and subscription exists."""
+        topics = self._unwrap("notification_topics")
+        if not topics:
+            self.finding("OCI-LOG-008", "No notification topics configured", self.SEVERITY_HIGH,
+                "Logging & Audit",
+                "No OCI Notification Service topics found. Notification topics are required for event-driven alerting.",
+                remed="Create at least one notification topic with active subscriptions (email, PagerDuty, Slack, etc.) for security alerts.",
+                refs=["CIS OCI 4.2"], cis="4.2")
+            return
+        active_with_subs = []
+        no_subs = []
+        for t in topics:
+            state = t.get("lifecycle-state", t.get("lifecycleState", ""))
+            name = t.get("name", t.get("display-name", t.get("displayName", "")))
+            if state != "ACTIVE":
+                continue
+            # Check for subscriptions
+            sub_count = t.get("subscription-count", t.get("subscriptionCount",
+                       len(t.get("subscriptions", []))))
+            if sub_count and int(sub_count) > 0:
+                active_with_subs.append(name)
+            else:
+                no_subs.append(name)
+        if not active_with_subs:
+            items = [f"{n}: no active subscriptions" for n in no_subs[:10]] if no_subs else ["No active topics found"]
+            self.finding("OCI-LOG-008", "Notification topics without subscriptions", self.SEVERITY_HIGH,
+                "Logging & Audit",
+                "No notification topics have active subscriptions. Alerts will not be delivered.",
+                items=items,
+                remed="Add subscriptions (email, HTTPS, PagerDuty, Slack) to notification topics to receive security alerts.",
+                refs=["CIS OCI 4.2"], cis="4.2")
+
+    def check_iam_vcn_event_rules(self):
+        """OCI-LOG-009 (CIS 4.3-4.12): Event rules for IAM/VCN/NSG changes."""
+        rules = self._unwrap("events_rules")
+        if not rules: return
+        # Collect all event types from active rules
+        event_types = set()
+        for r in rules:
+            state = r.get("lifecycle-state", r.get("lifecycleState", ""))
+            enabled = r.get("is-enabled", r.get("isEnabled", False))
+            if state != "ACTIVE" or not enabled: continue
+            condition = r.get("condition", r.get("conditionStr", ""))
+            if isinstance(condition, str):
+                condition_lower = condition.lower()
+            elif isinstance(condition, dict):
+                condition_lower = str(condition).lower()
+            else:
+                continue
+            event_types.add(condition_lower)
+        # Check for required event type categories
+        all_conditions = " ".join(event_types)
+        required_events = {
+            "IAM group changes (CIS 4.3)": ["com.oraclecloud.identitycontrolplane.creategroup",
+                                              "com.oraclecloud.identitycontrolplane.deletegroup",
+                                              "com.oraclecloud.identitycontrolplane.updategroup"],
+            "IAM policy changes (CIS 4.4)": ["com.oraclecloud.identitycontrolplane.createpolicy",
+                                               "com.oraclecloud.identitycontrolplane.deletepolicy",
+                                               "com.oraclecloud.identitycontrolplane.updatepolicy"],
+            "IAM user changes (CIS 4.5)": ["com.oraclecloud.identitycontrolplane.createuser",
+                                             "com.oraclecloud.identitycontrolplane.deleteuser",
+                                             "com.oraclecloud.identitycontrolplane.updateuser"],
+            "VCN changes (CIS 4.6)": ["com.oraclecloud.virtualnetwork.createvcn",
+                                        "com.oraclecloud.virtualnetwork.deletevcn",
+                                        "com.oraclecloud.virtualnetwork.updatevcn"],
+            "Route table changes (CIS 4.7)": ["com.oraclecloud.virtualnetwork.createroutetable",
+                                                "com.oraclecloud.virtualnetwork.deleteroutetable",
+                                                "com.oraclecloud.virtualnetwork.updateroutetable"],
+            "Security list changes (CIS 4.8)": ["com.oraclecloud.virtualnetwork.createsecuritylist",
+                                                  "com.oraclecloud.virtualnetwork.deletesecuritylist",
+                                                  "com.oraclecloud.virtualnetwork.updatesecuritylist"],
+            "NSG changes (CIS 4.9)": ["com.oraclecloud.virtualnetwork.changenetworksecuritygroup",
+                                        "com.oraclecloud.virtualnetwork.createnetworksecuritygroup",
+                                        "com.oraclecloud.virtualnetwork.deletenetworksecuritygroup",
+                                        "com.oraclecloud.virtualnetwork.updatenetworksecuritygroup"],
+            "Internet gateway changes (CIS 4.10)": ["com.oraclecloud.virtualnetwork.createinternetgateway",
+                                                      "com.oraclecloud.virtualnetwork.deleteinternetgateway",
+                                                      "com.oraclecloud.virtualnetwork.updateinternetgateway"],
+        }
+        missing = []
+        for desc, event_list in required_events.items():
+            found = any(evt.lower() in all_conditions for evt in event_list)
+            # Also check for broad patterns like "identitycontrolplane" or "virtualnetwork"
+            if not found:
+                keyword = event_list[0].split(".")[2] if len(event_list[0].split(".")) > 2 else ""
+                if keyword and keyword.lower() in all_conditions:
+                    found = True
+            if not found:
+                missing.append(desc)
+        if missing:
+            self.finding("OCI-LOG-009", "Event rules missing for IAM/VCN changes", self.SEVERITY_HIGH,
+                "Logging & Audit",
+                f"{len(missing)} required event rule category(ies) are not configured for change monitoring.",
+                items=missing[:20],
+                remed="Create Events rules for all IAM and networking change events (groups, policies, users, VCNs, route tables, security lists, NSGs, internet gateways).",
+                refs=["CIS OCI 4.3", "CIS OCI 4.4", "CIS OCI 4.5", "CIS OCI 4.6",
+                       "CIS OCI 4.7", "CIS OCI 4.8", "CIS OCI 4.9", "CIS OCI 4.10"],
+                cis="4.3-4.12")
+
+    def check_cloud_guard_notification(self):
+        """OCI-LOG-010 (CIS 4.15): Notification for Cloud Guard problems."""
+        rules = self._unwrap("events_rules")
+        if not rules:
+            self.finding("OCI-LOG-010", "No Cloud Guard problem notifications", self.SEVERITY_HIGH,
+                "Logging & Audit",
+                "No Events rules found. A rule for Cloud Guard problem detection events is required for timely alerting.",
+                remed="Create an Events rule that triggers on Cloud Guard problem detected events and sends notifications to a subscribed topic.",
+                refs=["CIS OCI 4.15"], cis="4.15")
+            return
+        has_cg_rule = False
+        for r in rules:
+            state = r.get("lifecycle-state", r.get("lifecycleState", ""))
+            enabled = r.get("is-enabled", r.get("isEnabled", False))
+            if state != "ACTIVE" or not enabled: continue
+            condition = r.get("condition", r.get("conditionStr", ""))
+            cond_str = str(condition).lower() if condition else ""
+            if ("cloudguard" in cond_str or "cloud_guard" in cond_str or "cloud-guard" in cond_str) and \
+               ("problem" in cond_str or "detected" in cond_str):
+                has_cg_rule = True
+                break
+        if not has_cg_rule:
+            self.finding("OCI-LOG-010", "No Cloud Guard problem notifications", self.SEVERITY_HIGH,
+                "Logging & Audit",
+                "No Events rule detected for Cloud Guard problem notifications. Security findings may go unnoticed.",
+                remed="Create an Events rule for 'com.oraclecloud.cloudguard.problemdetected' events with notification action to an active topic.",
+                refs=["CIS OCI 4.15"], cis="4.15")
+
+    def check_object_storage_write_logs(self):
+        """OCI-LOG-011 (CIS 4.17): Object Storage write logging enabled."""
+        lgs = self._unwrap("log_groups")
+        if not lgs:
+            self.finding("OCI-LOG-011", "Object Storage write logging not enabled", self.SEVERITY_MEDIUM,
+                "Logging & Audit",
+                "No log groups found. Object Storage write logs should be enabled for data change auditing.",
+                remed="Enable write logging for Object Storage buckets via log groups in the Logging service.",
+                refs=["CIS OCI 4.17"], cis="4.17")
+            return
+        has_os_write_log = False
+        for lg in lgs:
+            logs = lg.get("logs", [])
+            for log in logs:
+                cfg = log.get("configuration", {})
+                src = cfg.get("source", {})
+                service = src.get("service", "").lower()
+                category = src.get("category", src.get("log-type", "")).lower()
+                if "objectstorage" in service or "object-storage" in service or "object_storage" in service:
+                    if "write" in category:
+                        has_os_write_log = True
+                        break
+            if has_os_write_log: break
+        if not has_os_write_log:
+            self.finding("OCI-LOG-011", "Object Storage write logging not enabled", self.SEVERITY_MEDIUM,
+                "Logging & Audit",
+                "No Object Storage write logs found in any log group. Write logs track data modifications for compliance auditing.",
+                remed="Enable Object Storage write logging: Logging > Log Groups > Create Log > Service=Object Storage, Category=Write.",
+                refs=["CIS OCI 4.17"], cis="4.17")
+
+    def check_local_user_auth_notification(self):
+        """OCI-LOG-012 (CIS 4.18): Notification for local OCI user authentication."""
+        rules = self._unwrap("events_rules")
+        if not rules:
+            self.finding("OCI-LOG-012", "No local user authentication notifications", self.SEVERITY_HIGH,
+                "Logging & Audit",
+                "No Events rules found. A rule for local user sign-on events is required to detect unauthorized local authentication.",
+                remed="Create an Events rule for identity sign-on events (com.oraclecloud.identitycontrolplane.interactivelogin) with notification action.",
+                refs=["CIS OCI 4.18"], cis="4.18")
+            return
+        has_signon_rule = False
+        for r in rules:
+            state = r.get("lifecycle-state", r.get("lifecycleState", ""))
+            enabled = r.get("is-enabled", r.get("isEnabled", False))
+            if state != "ACTIVE" or not enabled: continue
+            condition = r.get("condition", r.get("conditionStr", ""))
+            cond_str = str(condition).lower() if condition else ""
+            if ("interactivelogin" in cond_str or "interactive-login" in cond_str or
+                    "interactive_login" in cond_str or
+                    ("identitycontrolplane" in cond_str and ("login" in cond_str or "signon" in cond_str or "sign-on" in cond_str))):
+                has_signon_rule = True
+                break
+        if not has_signon_rule:
+            self.finding("OCI-LOG-012", "No local user authentication notifications", self.SEVERITY_HIGH,
+                "Logging & Audit",
+                "No Events rule detected for local user sign-on events. Local authentication bypass of federation may go undetected.",
+                remed="Create an Events rule for 'com.oraclecloud.identitycontrolplane.interactivelogin' with notification action to detect local user authentication.",
+                refs=["CIS OCI 4.18"], cis="4.18")
 
 
 class CloudGuardAuditor(BaseAuditor):

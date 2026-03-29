@@ -1,0 +1,11 @@
+{"data": [
+  {
+    "id": "ocid1.filesystem.oc1..aaa1",
+    "display-name": "shared-fs-01",
+    "compartment-id": "ocid1.compartment.oc1..aaaprod",
+    "lifecycle-state": "ACTIVE",
+    "kms-key-id": "",
+    "time-created": "2024-05-01T00:00:00Z",
+    "metered-bytes": 1073741824
+  }
+]}
