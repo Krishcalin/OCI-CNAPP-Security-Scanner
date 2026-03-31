@@ -1,0 +1,3247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oracle Cloud Infrastructure — Security Assessment Report</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg-primary: #0a0e17;
+    --bg-secondary: #111827;
+    --bg-card: #1a2332;
+    --bg-card-hover: #1f2b3d;
+    --border: #2a3548;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent: #C74634;
+    --accent-dim: rgba(199, 70, 52, 0.12);
+    --critical: #ef4444;
+    --critical-bg: rgba(239, 68, 68, 0.08);
+    --high: #f97316;
+    --high-bg: rgba(249, 115, 22, 0.08);
+    --medium: #eab308;
+    --medium-bg: rgba(234, 179, 8, 0.08);
+    --low: #22c55e;
+    --low-bg: rgba(34, 197, 94, 0.08);
+    --info-c: #C74634;
+    --info-bg: rgba(199, 70, 52, 0.08);
+    --font-sans: 'DM Sans', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .noise {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-left h1 {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+  }
+
+  .header-left .subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .header-right {
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .header-right span { display: block; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .risk-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .risk-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: #dc2626;
+  }
+
+  .risk-score-ring {
+    width: 140px;
+    height: 140px;
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  .risk-score-ring svg {
+    transform: rotate(-90deg);
+    width: 140px;
+    height: 140px;
+  }
+
+  .risk-score-ring .score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .risk-score-ring .score-number {
+    font-family: var(--font-mono);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #dc2626;
+    line-height: 1;
+  }
+
+  .risk-score-ring .score-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .risk-level {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #dc2626;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .severity-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    align-content: start;
+  }
+
+  .sev-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+
+  .sev-card:hover { background: var(--bg-card-hover); }
+
+  .sev-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .sev-card.critical::before { background: var(--critical); }
+  .sev-card.high::before { background: var(--high); }
+  .sev-card.medium::before { background: var(--medium); }
+  .sev-card.low::before { background: var(--low); }
+
+  .sev-card .sev-count {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .sev-card.critical .sev-count { color: var(--critical); }
+  .sev-card.high .sev-count { color: var(--high); }
+  .sev-card.medium .sev-count { color: var(--medium); }
+  .sev-card.low .sev-count { color: var(--low); }
+
+  .sev-card .sev-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.25rem;
+  }
+
+  .categories-section { margin-bottom: 2.5rem; }
+
+  .categories-section h2 {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+  }
+
+  .cat-bars { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  .cat-bar-row {
+    display: grid;
+    grid-template-columns: 220px 1fr 50px;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .cat-bar-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    text-align: right;
+  }
+
+  .cat-bar-track {
+    height: 20px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .cat-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #e07862);
+    border-radius: 4px;
+    min-width: 2px;
+    transition: width 0.8s ease-out;
+  }
+
+  .cat-bar-count {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .filter-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-bar label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 0.5rem;
+  }
+
+  .filter-btn {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .filter-btn.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .findings-section h2 {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+  }
+
+  .finding-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+
+  .finding-card:hover { background: var(--bg-card-hover); }
+
+  .finding-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .sev-badge {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    min-width: 72px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .sev-badge.CRITICAL { background: var(--critical-bg); color: var(--critical); border: 1px solid rgba(239,68,68,0.2); }
+  .sev-badge.HIGH { background: var(--high-bg); color: var(--high); border: 1px solid rgba(249,115,22,0.2); }
+  .sev-badge.MEDIUM { background: var(--medium-bg); color: var(--medium); border: 1px solid rgba(234,179,8,0.2); }
+  .sev-badge.LOW { background: var(--low-bg); color: var(--low); border: 1px solid rgba(34,197,94,0.2); }
+
+  .finding-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+  }
+
+  .finding-id {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .finding-chevron {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+  }
+
+  .finding-card.open .finding-chevron { transform: rotate(90deg); }
+
+  .finding-body {
+    display: none;
+    padding: 0 1.25rem 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .finding-card.open .finding-body { display: block; }
+
+  .finding-section { margin-top: 1rem; }
+
+  .finding-section-title {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+  }
+
+  .finding-section p {
+    font-size: 0.825rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .affected-list {
+    list-style: none;
+    padding: 0.75rem 1rem;
+    margin: 0;
+    background: var(--bg-primary);
+    border-radius: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .affected-list li {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    padding: 0.2rem 0;
+    border-bottom: 1px solid rgba(42, 53, 72, 0.5);
+  }
+
+  .affected-list li:last-child { border: none; }
+
+  .ref-list { list-style: none; padding: 0; }
+
+  .ref-list li {
+    font-size: 0.8rem;
+    color: var(--accent);
+    padding: 0.15rem 0;
+  }
+
+  .ref-list li::before {
+    content: '> ';
+    color: var(--text-muted);
+  }
+
+  .remediation-text {
+    background: rgba(34, 197, 94, 0.05);
+    border-left: 3px solid var(--low);
+    padding: 0.75rem 1rem;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.825rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 900px) {
+    .summary-grid { grid-template-columns: 1fr; }
+    .severity-grid { grid-template-columns: repeat(2, 1fr); }
+    .cat-bar-row { grid-template-columns: 140px 1fr 40px; }
+  }
+
+  @media print {
+    body { background: white; color: #111; }
+    .finding-body { display: block !important; }
+    .noise { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="container">
+
+  <div class="header">
+    <div class="header-left">
+      <h1>Oracle Cloud Infrastructure</h1>
+      <div class="subtitle">CNAPP Security Assessment Report</div>
+    </div>
+    <div class="header-right">
+      <span>Scan: 2026-03-31T07:50:27</span>
+      <span>Source: sample_data</span>
+      <span>Modules: iam, network, compute, storage, database, logging, cloudguard, oke, vault, waf, bastion, iac, cis</span>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="risk-card">
+      <div class="risk-score-ring">
+        <svg viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="60" fill="none" stroke="#1e293b" stroke-width="10"/>
+          <circle cx="70" cy="70" r="60" fill="none" stroke="#dc2626" stroke-width="10"
+            stroke-dasharray="377.0 0.0"
+            stroke-linecap="round"/>
+        </svg>
+        <div class="score-text">
+          <div class="score-number">100</div>
+          <div class="score-label">Risk Score</div>
+        </div>
+      </div>
+      <div class="risk-level">Critical Risk</div>
+    </div>
+
+    <div class="severity-grid">
+      <div class="sev-card critical">
+        <div class="sev-count">8</div>
+        <div class="sev-label">Critical</div>
+      </div>
+      <div class="sev-card high">
+        <div class="sev-count">36</div>
+        <div class="sev-label">High</div>
+      </div>
+      <div class="sev-card medium">
+        <div class="sev-count">41</div>
+        <div class="sev-label">Medium</div>
+      </div>
+      <div class="sev-card low">
+        <div class="sev-count">8</div>
+        <div class="sev-label">Low</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="categories-section">
+    <h2>Findings by Category</h2>
+    <div class="cat-bars">
+      
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">IAM &amp; Policies</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 100.0%"></div></div>
+        <div class="cat-bar-count">20</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Networking &amp; VCN</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 60.0%"></div></div>
+        <div class="cat-bar-count">12</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Logging &amp; Audit</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 55.00000000000001%"></div></div>
+        <div class="cat-bar-count">11</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Compute</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 40.0%"></div></div>
+        <div class="cat-bar-count">8</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Object Storage</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 40.0%"></div></div>
+        <div class="cat-bar-count">8</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">OKE / Kubernetes</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 40.0%"></div></div>
+        <div class="cat-bar-count">8</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Database Security</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 30.0%"></div></div>
+        <div class="cat-bar-count">6</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Cloud Guard</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 25.0%"></div></div>
+        <div class="cat-bar-count">5</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Vault &amp; KMS</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 25.0%"></div></div>
+        <div class="cat-bar-count">5</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">WAF &amp; Edge Security</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 20.0%"></div></div>
+        <div class="cat-bar-count">4</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Terraform / IaC</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 15.0%"></div></div>
+        <div class="cat-bar-count">3</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">Bastion Security</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 10.0%"></div></div>
+        <div class="cat-bar-count">2</div>
+      </div>
+
+      <div class="cat-bar-row">
+        <div class="cat-bar-label">CIS Benchmark</div>
+        <div class="cat-bar-track"><div class="cat-bar-fill" style="width: 5.0%"></div></div>
+        <div class="cat-bar-count">1</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <label>Filter:</label>
+    <button class="filter-btn active" onclick="filterFindings('ALL')">All (93)</button>
+    <button class="filter-btn" onclick="filterFindings('CRITICAL')">Critical (8)</button>
+    <button class="filter-btn" onclick="filterFindings('HIGH')">High (36)</button>
+    <button class="filter-btn" onclick="filterFindings('MEDIUM')">Medium (41)</button>
+    <button class="filter-btn" onclick="filterFindings('LOW')">Low (8)</button>
+  </div>
+
+  <div class="findings-section">
+    <h2>Detailed Findings (93)</h2>
+    
+    <div class="finding-card" data-severity="CRITICAL" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">Resources in root compartment</span>
+        <span class="finding-id">OCI-IAM-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Production resources should not reside in the root compartment. Use sub-compartments for resource isolation and policy scoping.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>web-server-prod</li><li>legacy-db-instance</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Move resources to dedicated sub-compartments. Create a compartment hierarchy matching your organizational structure.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="CRITICAL" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">MFA not enforced for IAM users</span>
+        <span class="finding-id">OCI-IAM-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>4 active IAM user(s) do not have MFA enabled. Multi-factor authentication is essential for protecting against credential compromise.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (4)</div>
+                  <ul class="affected-list"><li>admin_user</li><li>dev_user</li><li>service_acct</li><li>contractor_user</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable MFA for all IAM users. Navigate to Identity &gt; Users &gt; User Details &gt; Enable MFA.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.7</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="CRITICAL" data-category="Networking &amp; VCN">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">SSH open to 0.0.0.0/0</span>
+        <span class="finding-id">OCI-NET-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Security list(s) allow SSH access from any source IP. This exposes instances to brute-force and unauthorized access.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>Default Security List: SSH (port 22) from 0.0.0.0/0</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Restrict SSH to specific CIDR blocks or use OCI Bastion service for secure access.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 2.2</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="CRITICAL" data-category="Networking &amp; VCN">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">RDP open to 0.0.0.0/0</span>
+        <span class="finding-id">OCI-NET-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Security list(s) allow RDP access from any source IP.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>Default Security List: RDP (port 3389) from 0.0.0.0/0</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Restrict RDP to specific CIDR blocks or disable RDP access entirely. Use Bastion service for remote access.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 2.3</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="CRITICAL" data-category="Networking &amp; VCN">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">NSG allows SSH from 0.0.0.0/0</span>
+        <span class="finding-id">OCI-NET-011</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 NSG rule(s) allow SSH (TCP/22) ingress from any source IP.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>NSG &#x27;web-tier-nsg&#x27;: all protocols (incl. SSH) from 0.0.0.0/0</li><li>NSG &#x27;web-tier-nsg&#x27;: SSH (port 22) from 0.0.0.0/0</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Restrict NSG SSH rules to specific CIDR blocks. Use OCI Bastion service for secure remote access.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 2.3</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="CRITICAL" data-category="Networking &amp; VCN">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">NSG allows RDP from 0.0.0.0/0</span>
+        <span class="finding-id">OCI-NET-012</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 NSG rule(s) allow RDP (TCP/3389) ingress from any source IP.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>NSG &#x27;web-tier-nsg&#x27;: all protocols (incl. RDP) from 0.0.0.0/0</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Restrict NSG RDP rules to specific CIDR blocks or disable RDP entirely. Use Bastion service for remote access.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 2.4</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="CRITICAL" data-category="Object Storage">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">Public buckets detected</span>
+        <span class="finding-id">OCI-STOR-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 bucket(s) have public access enabled. Data may be exposed to the internet.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>public-assets (access: ObjectRead)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Set bucket access type to &#x27;NoPublicAccess&#x27;. Use pre-authenticated requests or IAM policies for controlled access.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 5.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="CRITICAL" data-category="Cloud Guard">
+      <div class="finding-header">
+        <span class="sev-badge CRITICAL">CRITICAL</span>
+        <span class="finding-title">Cloud Guard not enabled</span>
+        <span class="finding-id">OCI-CG-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Cloud Guard is in &#x27;DISABLED&#x27; state. It should be enabled for continuous security monitoring.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>Status: DISABLED</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Cloud Guard: Security &gt; Cloud Guard &gt; Enable.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 4.6</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Overly broad policy statements</span>
+        <span class="finding-id">OCI-IAM-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Policy statements granting &#x27;manage all-resources&#x27; without conditions violate least-privilege principle.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>AdminFullAccess: Allow group Administrators to manage all-resources in tenancy</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Scope policies to specific resource types and compartments. Use conditions (where clauses) to limit scope.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.2</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">API keys older than 90 days</span>
+        <span class="finding-id">OCI-IAM-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>3 API signing key(s) exceed the 90-day rotation threshold.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>user=ocid1.user.oc1..aaauseradmin... key=12:34:56:78:90:ab:cd... (440 days)</li><li>user=ocid1.user.oc1..aaauserdev... key=ab:cd:ef:12:34:56:78... (440 days)</li><li>user=ocid1.user.oc1..aaauseradmin... key=34:56:78:90:ab:cd:ef... (303 days)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Rotate API keys every 90 days. Generate a new key pair and deactivate the old key.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.8</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Auth tokens not rotated</span>
+        <span class="finding-id">OCI-IAM-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 auth token(s) are older than 90 days.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>OCIR push token for CI/CD (423 days)</li><li>Streaming token for service account (423 days)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Regenerate auth tokens every 90 days. Delete unused tokens immediately.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.9</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Admin group has excessive members</span>
+        <span class="finding-id">OCI-IAM-008</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>The &#x27;Administrators&#x27; group has 7 members (threshold: 5). Limit admin access to reduce blast radius.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (7)</div>
+                  <ul class="affected-list"><li>ocid1.user.oc1..aaauseradmin</li><li>ocid1.user.oc1..aaaunknown001</li><li>ocid1.user.oc1..aaaunknown002</li><li>ocid1.user.oc1..aaaunknown003</li><li>ocid1.user.oc1..aaaunknown004</li><li>ocid1.user.oc1..aaaunknown005</li><li>ocid1.user.oc1..aaaunknown006</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Review admin group membership. Remove unnecessary members and use just-in-time access.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.4</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Policy allows all-resources in tenancy</span>
+        <span class="finding-id">OCI-IAM-009</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 policy statement(s) grant tenancy-wide resource access. This violates compartment isolation.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>AdminFullAccess: Allow group Administrators to manage all-resources in tenancy</li><li>DeveloperBroadAccess: Allow group Developers to use all-resources in tenancy</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Scope policies to specific compartments instead of tenancy. Use &#x27;in compartment &lt;name&gt;&#x27; instead of &#x27;in tenancy&#x27;.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">IAM admins can update Administrators group</span>
+        <span class="finding-id">OCI-IAM-011</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 policy statement(s) allow user/group management without excluding the Administrators group.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>IAMAdminPolicy: Allow group IAMAdmins to use users in tenancy</li><li>IAMAdminPolicy: Allow group IAMAdmins to use groups in tenancy</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Add condition &quot;where target.group.name != &#x27;Administrators&#x27;&quot; to policies granting &#x27;use users&#x27; or &#x27;use groups&#x27; in tenancy.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.3</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Customer secret keys older than 90 days</span>
+        <span class="finding-id">OCI-IAM-014</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 customer secret key(s) exceed the 90-day rotation threshold.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>user=ocid1.user.oc1..aaauseradmin... key=s3-compat-key-1 (445 days)</li><li>user=ocid1.user.oc1..aaauserdev... key=s3-compat-key-2 (303 days)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Rotate customer secret keys every 90 days. Generate a new key and deactivate the old one.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.9</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">API keys on tenancy admin users</span>
+        <span class="finding-id">OCI-IAM-015</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 tenancy admin user(s) have API keys. Admin users should use console or federation, not API keys.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>admin user=ocid1.user.oc1..aaauseradmin... key=12:34:56:78:90:ab:cd...</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Remove API keys from admin users. Use federation/SSO for admin access and Instance Principals for automation.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.12</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Credentials unused for 45+ days</span>
+        <span class="finding-id">OCI-IAM-019</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>4 active IAM user(s) have not logged in for over 45 days. Stale credentials increase attack surface.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (4)</div>
+                  <ul class="affected-list"><li>admin_user: idle 750 days (last activity: 2024-03-10)</li><li>dev_user: idle 653 days (last activity: 2024-06-15)</li><li>service_acct: idle 575 days (last activity: 2024-09-01)</li><li>contractor_user: idle 242 days (last activity: 2025-08-01)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Disable or remove IAM users who have not logged in for 45+ days. Implement an automated credential lifecycle policy.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.16</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Networking &amp; VCN">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Default security list allows all egress</span>
+        <span class="finding-id">OCI-NET-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Security list(s) permit unrestricted outbound traffic to all destinations.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>Default Security List: egress all to 0.0.0.0/0</li><li>Backend Security List: egress all to 0.0.0.0/0</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Restrict egress rules to only required destinations and ports. Remove &#x27;all protocols to 0.0.0.0/0&#x27; rules.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 2.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Networking &amp; VCN">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">NSG rules overly permissive</span>
+        <span class="finding-id">OCI-NET-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Network Security Group(s) contain rules allowing all traffic from any source.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>NSG &#x27;web-tier-nsg&#x27;: allows all ingress from 0.0.0.0/0</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Restrict NSG rules to specific ports and source CIDRs required by the application.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 2.4</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Networking &amp; VCN">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Subnets without VCN flow logs</span>
+        <span class="finding-id">OCI-NET-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>3 subnet(s) do not have VCN flow logs enabled for network traffic visibility.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>public-subnet-prod (ocid1.subnet.oc1..aaapublic...)</li><li>private-subnet-prod (ocid1.subnet.oc1..aaaprivate...)</li><li>dev-subnet (ocid1.subnet.oc1..aaadev...)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable VCN flow logs on all subnets. Navigate to Networking &gt; VCN &gt; Subnet &gt; Enable Flow Logs.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 2.5</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Compute">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">In-transit encryption disabled</span>
+        <span class="finding-id">OCI-COMP-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>3 instance(s) do not have in-transit encryption enabled for boot/block volumes.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>web-server-1</li><li>app-server-1</li><li>db-server-1</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable in-transit encryption when launching instances. Use paravirtualized attachments with encryption.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 3.3</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Compute">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Instances with public IPs</span>
+        <span class="finding-id">OCI-COMP-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 instance(s) have public IP addresses assigned, directly exposing them to the internet.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>web-server-1</li><li>app-server-1</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Remove public IPs from instances. Use load balancers, NAT gateways, or Bastion service for external access.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 3.4</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Compute">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Instance Metadata Service v1 in use</span>
+        <span class="finding-id">OCI-COMP-007</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 instance(s) have legacy IMDS v1 endpoints enabled. IMDSv1 is vulnerable to SSRF-based credential theft.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>web-server-1</li><li>app-server-1</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Disable legacy IMDS endpoints. Set &#x27;are-legacy-imds-endpoints-disabled&#x27; to true for all instances.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 3.6</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Object Storage">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Pre-authenticated requests review</span>
+        <span class="finding-id">OCI-STOR-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 pre-authenticated request(s) have long expiration times or broad access.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>public-assets/public-assets-readonly-par: AnyObjectReadWrite, expires in 639 days</li><li>app-data/app-data-upload-par: AnyObjectReadWrite, expires in 639 days</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Review and revoke unnecessary PARs. Set short expiration times and scope to specific objects.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 5.4</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Database Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">DB Systems without automated backups</span>
+        <span class="finding-id">OCI-DB-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 DB System(s) do not have automated backups enabled.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>legacy-oracle-db</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable automated backups for all DB Systems. Set an appropriate retention period (minimum 30 days).</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Database Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">MySQL HeatWave without private endpoint</span>
+        <span class="finding-id">OCI-DB-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 MySQL HeatWave instance(s) are publicly accessible.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>analytics-mysql (129.146.10.50)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Deploy MySQL HeatWave instances in private subnets. Disable public access and use Bastion or VPN for connectivity.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Database Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Database not in private subnet</span>
+        <span class="finding-id">OCI-DB-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>3 database(s) are deployed in public subnets, potentially exposing them to the internet.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>DB System: legacy-oracle-db</li><li>ADB: analytics-db</li><li>ADB: reporting-db</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Deploy databases in private subnets (prohibitPublicIpOnVnic=true). Use service gateways for Oracle service access.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Logging &amp; Audit">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Audit log retention below 365 days</span>
+        <span class="finding-id">OCI-LOG-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Audit log retention is set to 90 days. Minimum 365 days is recommended for compliance.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>Current retention: 90 days (recommended: 365)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Increase audit log retention to 365 days. Navigate to Identity &gt; Audit &gt; Retention Period.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 4.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Logging &amp; Audit">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">VCN flow logs not enabled</span>
+        <span class="finding-id">OCI-LOG-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No VCN flow logs are configured. Flow logs provide visibility into network traffic.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>public-subnet-prod</li><li>private-subnet-prod</li><li>dev-subnet</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable VCN flow logs on all subnets for network traffic analysis and security monitoring.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 4.2</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Logging &amp; Audit">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">No alarms configured</span>
+        <span class="finding-id">OCI-LOG-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No monitoring alarms configured. Alarms provide proactive notification of security-relevant metric changes.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create alarms for: high CPU/memory usage, unauthorized API calls, security list changes, failed login attempts.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 4.5</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Logging &amp; Audit">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">No notification topics configured</span>
+        <span class="finding-id">OCI-LOG-008</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No OCI Notification Service topics found. Notification topics are required for event-driven alerting.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create at least one notification topic with active subscriptions (email, PagerDuty, Slack, etc.) for security alerts.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 4.2</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Logging &amp; Audit">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Event rules missing for IAM/VCN changes</span>
+        <span class="finding-id">OCI-LOG-009</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>5 required event rule category(ies) are not configured for change monitoring.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (5)</div>
+                  <ul class="affected-list"><li>VCN changes (CIS 4.6)</li><li>Route table changes (CIS 4.7)</li><li>Security list changes (CIS 4.8)</li><li>NSG changes (CIS 4.9)</li><li>Internet gateway changes (CIS 4.10)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create Events rules for all IAM and networking change events (groups, policies, users, VCNs, route tables, security lists, NSGs, internet gateways).</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 4.3</li><li>CIS OCI 4.4</li><li>CIS OCI 4.5</li><li>CIS OCI 4.6</li><li>CIS OCI 4.7</li><li>CIS OCI 4.8</li><li>CIS OCI 4.9</li><li>CIS OCI 4.10</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Logging &amp; Audit">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">No Cloud Guard problem notifications</span>
+        <span class="finding-id">OCI-LOG-010</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No Events rule detected for Cloud Guard problem notifications. Security findings may go unnoticed.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create an Events rule for &#x27;com.oraclecloud.cloudguard.problemdetected&#x27; events with notification action to an active topic.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 4.15</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Logging &amp; Audit">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">No local user authentication notifications</span>
+        <span class="finding-id">OCI-LOG-012</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No Events rule detected for local user sign-on events. Local authentication bypass of federation may go undetected.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create an Events rule for &#x27;com.oraclecloud.identitycontrolplane.interactivelogin&#x27; with notification action to detect local user authentication.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 4.18</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Cloud Guard">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Detector recipes not configured</span>
+        <span class="finding-id">OCI-CG-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No Cloud Guard detector recipes found. Detector recipes define what security issues to monitor.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Configure Cloud Guard detector recipes for configuration and activity monitoring.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 4.7</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Cloud Guard">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Responder recipes not configured</span>
+        <span class="finding-id">OCI-CG-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 Cloud Guard target(s) have no responder recipes for automated remediation.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-target</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Configure responder recipes on Cloud Guard targets to enable automated or guided remediation.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 4.8</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="OKE / Kubernetes">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Public API endpoint</span>
+        <span class="finding-id">OCI-OKE-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 OKE cluster(s) have public Kubernetes API endpoints, exposing the control plane to the internet.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-oke-cluster</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Configure private API endpoints for OKE clusters. Use Bastion or VPN for kubectl access.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="OKE / Kubernetes">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Network policies not enforced</span>
+        <span class="finding-id">OCI-OKE-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 OKE cluster(s) may not support Kubernetes Network Policies for pod-to-pod segmentation.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-oke-cluster (CNI: FLANNEL_OVERLAY)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Use VCN-Native Pod Networking CNI for native network policy support, or install Calico for flannel-based clusters.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="OKE / Kubernetes">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">RBAC not integrated with OCI IAM</span>
+        <span class="finding-id">OCI-OKE-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 OKE cluster(s) do not have RBAC integrated with OCI IAM for centralized access control.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-oke-cluster (type: BASIC_CLUSTER, no OCI IAM RBAC)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Configure Kubernetes RBAC to map to OCI IAM groups and policies for centralized access management.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="OKE / Kubernetes">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Workload identity not configured</span>
+        <span class="finding-id">OCI-OKE-006</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 OKE cluster(s) do not have Workload Identity enabled for pod-level IAM integration.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-oke-cluster</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable OKE Workload Identity to allow pods to authenticate to OCI services using Kubernetes service accounts.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Vault &amp; KMS">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Vault keys without rotation</span>
+        <span class="finding-id">OCI-KMS-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 encryption key(s) have not been rotated. Keys should be rotated periodically.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>master-encryption-key: key created 668 days ago, no rotation detected</li><li>app-data-key: key created 576 days ago, no rotation detected</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable automatic key rotation or manually rotate keys. Navigate to Vault &gt; Key &gt; Rotate Key.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.10</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Vault &amp; KMS">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Overly broad key access policies</span>
+        <span class="finding-id">OCI-KMS-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>3 policy statement(s) grant broad access to Vault/KMS resources.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>KeyManagementPolicy: Allow group Administrators to manage keys in tenancy</li><li>KeyManagementPolicy: Allow group Administrators to manage vaults in tenancy</li><li>KeyManagementPolicy: Allow service objectstorage-us-ashburn-1 to use keys in tenancy</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Scope KMS policies to specific compartments and key OCIDs. Separate key management from key usage permissions.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="WAF &amp; Edge Security">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Load balancers without WAF policy</span>
+        <span class="finding-id">OCI-WAF-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 load balancer(s) are not protected by a Web Application Firewall policy.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>prod-public-lb</li><li>internal-api-lb</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create WAF policies and attach them to load balancers to protect web applications from OWASP Top 10 attacks.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="HIGH" data-category="Terraform / IaC">
+      <div class="finding-header">
+        <span class="sev-badge HIGH">HIGH</span>
+        <span class="finding-title">Terraform state misconfigurations</span>
+        <span class="finding-id">OCI-IAC-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>3 potential misconfiguration(s) found in Terraform state.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>oci_objectstorage_bucket: public bucket detected</li><li>oci_objectstorage_bucket: no KMS key assigned</li><li>oci_core_security_list: rule with source 0.0.0.0/0</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Review Terraform state for security issues. Update Terraform configurations and apply corrected plans.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Users not in groups</span>
+        <span class="finding-id">OCI-IAM-006</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>3 IAM user(s) are not assigned to any group. Group-based access control simplifies policy management.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>dev_user</li><li>service_acct</li><li>contractor_user</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Assign all users to appropriate groups. Apply policies to groups, not individual users.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.3</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">No federation configured</span>
+        <span class="finding-id">OCI-IAM-007</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No identity provider federation is configured. Federation with enterprise IdP (SAML/OIDC) centralizes identity management.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Configure federation with your enterprise identity provider (Azure AD, Okta, etc.) via Identity &gt; Federation.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.12</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">No password policy configured</span>
+        <span class="finding-id">OCI-IAM-010</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Password policy does not meet security requirements.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>Minimum length 8 (recommended: 14)</li><li>Uppercase characters not required</li><li>Special characters not required</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Update password policy: minimum 14 characters, require uppercase, lowercase, numeric, and special characters.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.5</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Password expiration not configured</span>
+        <span class="finding-id">OCI-IAM-012</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Password expiration is not configured. Passwords should expire within 365 days.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>No expiration policy set</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Configure password expiration to 365 days or less under Identity &gt; Authentication Settings.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.5</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Password reuse prevention insufficient</span>
+        <span class="finding-id">OCI-IAM-013</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Password policy remembers 0 previous passwords. CIS requires at least 24 to prevent reuse.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>Current: 0 passwords remembered (recommended: &gt;= 24)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Set &#x27;previous passwords remembered&#x27; to at least 24 under Identity &gt; Authentication Settings.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.6</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">IAM users without valid email</span>
+        <span class="finding-id">OCI-IAM-016</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 active IAM user(s) do not have a valid email address configured.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>contractor_user</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Set a valid email address for all IAM users for password recovery and security notifications.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.13</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Instance Principal not used</span>
+        <span class="finding-id">OCI-IAM-017</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>3 running instance(s) found but no Instance Principal (dynamic group) policies detected. Instances may be using stored credentials instead of Instance Principal for OCI API access.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>web-server-1</li><li>app-server-1</li><li>db-server-1</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create dynamic groups and policies for Instance Principal authentication. Remove stored API keys from instances.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.14</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Storage admins can delete resources</span>
+        <span class="finding-id">OCI-IAM-018</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>3 policy statement(s) grant storage management without restricting delete permissions.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>DeveloperBroadAccess: Allow group Developers to manage object-family in compartment production</li><li>IAMAdminPolicy: Allow group StorageAdmins to manage volumes in tenancy</li><li>IAMAdminPolicy: Allow group StorageAdmins to manage buckets in tenancy</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Add condition &quot;where request.permission != &#x27;*_DELETE&#x27;&quot; to storage admin policies to prevent accidental or malicious deletion.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.15</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="IAM &amp; Policies">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Multiple active API keys per user</span>
+        <span class="finding-id">OCI-IAM-020</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 user(s) have more than one active API key. Each user should have only one active key to simplify rotation.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>user=ocid1.user.oc1..aaauseradmin...: 2 active keys</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Remove redundant API keys. Maintain only one active API key per user and rotate regularly.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 1.17</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Networking &amp; VCN">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Internet gateway on sensitive VCN</span>
+        <span class="finding-id">OCI-NET-006</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 internet gateway(s) are enabled. Review whether public internet access is required for each VCN.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-igw (VCN: ocid1.vcn.oc1..aaa1...)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Remove or disable internet gateways on VCNs hosting sensitive workloads. Use NAT or service gateways instead.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 2.6</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Networking &amp; VCN">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Route table misconfigurations</span>
+        <span class="finding-id">OCI-NET-008</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Route table(s) have configuration issues.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>empty-route-table: empty route table (no rules)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Review route tables and ensure routes point to valid targets (IGW, NAT, DRG, service gateway).</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Networking &amp; VCN">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Service gateway not used</span>
+        <span class="finding-id">OCI-NET-009</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No service gateways found. Service gateways enable private access to Oracle services without traversing the internet.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create service gateways in VCNs that access Oracle services (Object Storage, Autonomous DB). Route traffic via service gateway.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 2.7</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Networking &amp; VCN">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Unrestricted ICMP ingress</span>
+        <span class="finding-id">OCI-NET-010</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Security list(s) allow ICMP from any source. This can be used for network reconnaissance.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>Default Security List: ICMP from 0.0.0.0/0</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Restrict ICMP to specific source CIDRs and ICMP types (e.g., type 3 code 4 for path MTU discovery).</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Compute">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Shielded Instance Secure Boot disabled</span>
+        <span class="finding-id">OCI-COMP-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 instance(s) do not have Secure Boot enabled. Secure Boot prevents unauthorized boot loaders.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>web-server-1</li><li>app-server-1</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Shielded Instance features (Secure Boot) when launching new instances. Existing instances require recreation.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 3.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Compute">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Measured Boot disabled</span>
+        <span class="finding-id">OCI-COMP-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 instance(s) do not have Measured Boot / vTPM enabled.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>web-server-1</li><li>app-server-1</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Measured Boot with vTPM when launching new instances for firmware integrity verification.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 3.2</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Compute">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Legacy images in use</span>
+        <span class="finding-id">OCI-COMP-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 instance(s) are running deprecated or end-of-life OS images.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>web-server-1 (image: ocid1.image.oc1..legacy...)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Migrate instances to supported OS images. Oracle Linux 8+ or 9+ is recommended.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Compute">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Boot volumes without customer-managed keys</span>
+        <span class="finding-id">OCI-COMP-006</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 boot volume(s) use Oracle-managed encryption instead of customer-managed keys.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>web-server-1-boot</li><li>app-server-1-boot</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Use OCI Vault customer-managed keys (CMK) for boot volume encryption for enhanced key control.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 3.5</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Object Storage">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Versioning not enabled</span>
+        <span class="finding-id">OCI-STOR-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 bucket(s) do not have object versioning enabled for data protection and recovery.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>public-assets</li><li>app-data</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable versioning on buckets containing important data. Navigate to Object Storage &gt; Bucket &gt; Edit &gt; Enable Versioning.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 5.2</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Object Storage">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Buckets without customer-managed keys</span>
+        <span class="finding-id">OCI-STOR-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 bucket(s) use Oracle-managed encryption. Customer-managed keys provide enhanced control.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>public-assets</li><li>app-data</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Assign a Vault master encryption key to each bucket for customer-managed encryption.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 5.3</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Object Storage">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Block volumes without customer-managed keys</span>
+        <span class="finding-id">OCI-STOR-007</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 block volume(s) use Oracle-managed encryption instead of customer-managed keys (CMK).</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>data-vol-01</li><li>app-vol-01</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Assign a Vault master encryption key (CMK) to each block volume for customer-managed encryption.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 5.2.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Object Storage">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">File storage without customer-managed keys</span>
+        <span class="finding-id">OCI-STOR-008</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 file system(s) use Oracle-managed encryption instead of customer-managed keys (CMK).</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>shared-fs-01</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Assign a Vault master encryption key (CMK) to each file system for customer-managed encryption.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 5.3.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Database Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">ADB without customer-managed encryption</span>
+        <span class="finding-id">OCI-DB-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 Autonomous Database(s) use Oracle-managed encryption keys.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>analytics-db</li><li>reporting-db</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Configure Autonomous Database to use a customer-managed encryption key from OCI Vault.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Database Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">IAM authentication not enabled for ADB</span>
+        <span class="finding-id">OCI-DB-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 Autonomous Database(s) do not have access control (IAM authentication) enabled.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>analytics-db</li><li>reporting-db</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable access control on Autonomous Database to restrict connections by IP/VCN and enable IAM-based authentication.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Database Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Database patch not current</span>
+        <span class="finding-id">OCI-DB-006</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 DB System(s) may be running outdated patch levels.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>legacy-oracle-db: v, no patch history</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Apply the latest database patches. Enable automatic maintenance windows for regular patching.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Logging &amp; Audit">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Service connector not configured</span>
+        <span class="finding-id">OCI-LOG-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No service connectors configured. Service Connector Hub enables log export to external SIEM, Object Storage, or Streaming.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create service connectors to export audit logs and other service logs to Object Storage or external SIEM.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 4.3</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Logging &amp; Audit">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Default tags missing creator identity</span>
+        <span class="finding-id">OCI-LOG-007</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Default tags exist but none include &#x27;${iam.principal.name}&#x27; for creator tracking.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>Tag: Department: IT</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Add a default tag rule with value &#x27;${iam.principal.name}&#x27; to track who created each resource.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 4.1</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Logging &amp; Audit">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Object Storage write logging not enabled</span>
+        <span class="finding-id">OCI-LOG-011</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No Object Storage write logs found in any log group. Write logs track data modifications for compliance auditing.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Object Storage write logging: Logging &gt; Log Groups &gt; Create Log &gt; Service=Object Storage, Category=Write.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI 4.17</li></ul>
+                </div>
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Cloud Guard">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Security zones not defined</span>
+        <span class="finding-id">OCI-CG-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No Security Zones configured. Security Zones enforce preventive security policies on compartments.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create Security Zones for compartments containing sensitive resources to enforce guardrails (e.g., no public buckets, encrypted volumes).</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Cloud Guard">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Unresolved Cloud Guard problems</span>
+        <span class="finding-id">OCI-CG-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 critical and 2 high-risk Cloud Guard problems remain unresolved.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>CRITICAL: Bucket is publicly accessible</li><li>HIGH: Instance has public IP address</li><li>HIGH: Security list allows SSH from internet</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Investigate and resolve open Cloud Guard problems. Prioritize CRITICAL findings first.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="OKE / Kubernetes">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Pod security standards not applied</span>
+        <span class="finding-id">OCI-OKE-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 OKE cluster(s) do not have Pod Security admission controls configured.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-oke-cluster</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Pod Security Standards (PSS) via PodSecurity admission controller. Apply &#x27;restricted&#x27; or &#x27;baseline&#x27; profiles.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="OKE / Kubernetes">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Node pool without secure boot</span>
+        <span class="finding-id">OCI-OKE-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 OKE node pool(s) do not have Shielded Instance (Secure Boot) enabled on worker nodes.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-node-pool</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable Shielded Instances with Secure Boot for OKE node pools to prevent unauthorized boot modifications.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="OKE / Kubernetes">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Image validation not enabled</span>
+        <span class="finding-id">OCI-OKE-007</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 OKE cluster(s) do not enforce container image signature validation.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-oke-cluster</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable image verification policies to ensure only signed and trusted container images are deployed.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="OKE / Kubernetes">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Node auto-upgrade disabled</span>
+        <span class="finding-id">OCI-OKE-008</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 OKE node pool(s) have auto-upgrade disabled or are running mismatched Kubernetes versions.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-node-pool: node v1.27.2 vs cluster v1.28.2</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable node pool auto-upgrade to keep worker nodes aligned with the cluster Kubernetes version.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Vault &amp; KMS">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Customer-managed keys not used</span>
+        <span class="finding-id">OCI-KMS-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>6 resource(s) use Oracle-managed encryption despite Vault keys being available.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (6)</div>
+                  <ul class="affected-list"><li>Bucket: public-assets</li><li>Bucket: app-data</li><li>Boot Volume: web-server-1-boot</li><li>Boot Volume: app-server-1-boot</li><li>ADB: analytics-db</li><li>ADB: reporting-db</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Assign customer-managed encryption keys from OCI Vault to all sensitive resources.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Vault &amp; KMS">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">HSM protection level not used</span>
+        <span class="finding-id">OCI-KMS-005</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 key(s) use software protection instead of HSM. HSM provides FIPS 140-2 Level 3 hardware protection.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>master-encryption-key (protection: SOFTWARE)</li><li>app-data-key (protection: SOFTWARE)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create keys with HSM protection mode for enhanced security. Use Dedicated KMS for single-tenant HSM requirements.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="WAF &amp; Edge Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">WAF protection rules not enabled</span>
+        <span class="finding-id">OCI-WAF-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>WAF policies have a majority of protection rules disabled.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>default-waf-policy: 0/3 rules active</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable protection rules in WAF policies, especially for SQL injection, XSS, and command injection categories.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="WAF &amp; Edge Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">No rate limiting configured</span>
+        <span class="finding-id">OCI-WAF-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 WAF policy(ies) do not have rate limiting rules configured.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>default-waf-policy</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Configure rate limiting rules to protect against brute-force attacks and DDoS at the application layer.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Bastion Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Session limits too permissive</span>
+        <span class="finding-id">OCI-BAST-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Bastion session TTL exceeds the recommended maximum duration.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-bastion: max TTL 12.0h (threshold: 3.0h)</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Reduce bastion max session TTL to 3 hours or less. Enforce just-in-time access with short sessions.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Bastion Security">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Bastion sessions not audit-logged</span>
+        <span class="finding-id">OCI-BAST-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No bastion session data available for audit. Ensure bastion activity is logged.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-bastion</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Verify that OCI Audit service captures bastion session events. Export audit logs to SIEM for monitoring.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Terraform / IaC">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Terraform plan resource deletions</span>
+        <span class="finding-id">OCI-IAC-002</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Terraform plan includes 2 resource deletion(s). Review before applying.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>oci_core_instance.legacy_server</li><li>oci_core_security_list.old_rules</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Review planned deletions carefully. Ensure no critical resources are being destroyed unintentionally.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="MEDIUM" data-category="Terraform / IaC">
+      <div class="finding-header">
+        <span class="sev-badge MEDIUM">MEDIUM</span>
+        <span class="finding-title">Terraform state stored locally</span>
+        <span class="finding-id">OCI-IAC-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Terraform state file is using local backend. State should be stored remotely for team collaboration and security.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>Backend type: local</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Configure remote backend using OCI Object Storage or Terraform Cloud. Enable state locking and encryption.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="LOW" data-category="Networking &amp; VCN">
+      <div class="finding-header">
+        <span class="sev-badge LOW">LOW</span>
+        <span class="finding-title">DRG not configured</span>
+        <span class="finding-id">OCI-NET-007</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No Dynamic Routing Gateway attachments found. DRG is required for VCN peering and on-premises connectivity.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>prod-vcn</li><li>dev-vcn</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create a DRG and attach it to VCNs that require cross-VCN or on-premises connectivity.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="LOW" data-category="Compute">
+      <div class="finding-header">
+        <span class="sev-badge LOW">LOW</span>
+        <span class="finding-title">Monitoring agent not enabled</span>
+        <span class="finding-id">OCI-COMP-008</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>3 instance(s) do not have the monitoring agent/plugin enabled.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>web-server-1</li><li>app-server-1</li><li>db-server-1</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable the Compute Instance Monitoring plugin in the Oracle Cloud Agent configuration.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="LOW" data-category="Object Storage">
+      <div class="finding-header">
+        <span class="sev-badge LOW">LOW</span>
+        <span class="finding-title">No lifecycle policies</span>
+        <span class="finding-id">OCI-STOR-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>3 bucket(s) have no lifecycle policies for automatic archiving or deletion of old objects.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (3)</div>
+                  <ul class="affected-list"><li>public-assets</li><li>app-data</li><li>backups</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create lifecycle policies to transition old objects to Archive/Infrequent Access tiers or delete expired objects.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="LOW" data-category="Object Storage">
+      <div class="finding-header">
+        <span class="sev-badge LOW">LOW</span>
+        <span class="finding-title">Replication not configured</span>
+        <span class="finding-id">OCI-STOR-006</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>2 bucket(s) do not have cross-region replication enabled for disaster recovery.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (2)</div>
+                  <ul class="affected-list"><li>public-assets</li><li>app-data</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable replication on buckets containing critical data for cross-region disaster recovery.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="LOW" data-category="Logging &amp; Audit">
+      <div class="finding-header">
+        <span class="sev-badge LOW">LOW</span>
+        <span class="finding-title">Log groups not organized</span>
+        <span class="finding-id">OCI-LOG-006</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>All logs are in the default log group. Organizing logs into purpose-specific groups improves manageability.</p>
+        </div>
+        
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create dedicated log groups for different services/environments (e.g., audit-logs, vcn-flow-logs, application-logs).</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="LOW" data-category="Vault &amp; KMS">
+      <div class="finding-header">
+        <span class="sev-badge LOW">LOW</span>
+        <span class="finding-title">Vault not replicated</span>
+        <span class="finding-id">OCI-KMS-003</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>1 vault(s) are not replicated across regions for disaster recovery.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>prod-vault</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Enable cross-region vault replication for critical encryption keys to ensure DR capability.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="LOW" data-category="WAF &amp; Edge Security">
+      <div class="finding-header">
+        <span class="sev-badge LOW">LOW</span>
+        <span class="finding-title">No custom WAF rules</span>
+        <span class="finding-id">OCI-WAF-004</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>No custom WAF protection rules are defined. Custom rules provide application-specific threat detection.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (1)</div>
+                  <ul class="affected-list"><li>default-waf-policy</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Create custom protection rules tailored to your application&#x27;s specific attack surface and threat model.</div>
+                </div>
+        
+      </div>
+    </div>
+
+    <div class="finding-card" data-severity="LOW" data-category="CIS Benchmark">
+      <div class="finding-header">
+        <span class="sev-badge LOW">LOW</span>
+        <span class="finding-title">CIS OCI Foundation Benchmark v2.0 assessment summary</span>
+        <span class="finding-id">OCI-CIS-001</span>
+        <span class="finding-chevron">&#9654;</span>
+      </div>
+      <div class="finding-body">
+        <div class="finding-section">
+          <div class="finding-section-title">Description</div>
+          <p>Summary of data coverage for CIS Oracle Cloud Infrastructure Foundations Benchmark v2.0 sections.</p>
+        </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Affected Items (5)</div>
+                  <ul class="affected-list"><li>Section 1 (Identity and Access Management): 7/8 config files loaded</li><li>Section 2 (Networking): 6/8 config files loaded</li><li>Section 3 (Compute): 3/3 config files loaded</li><li>Section 4 (Logging and Monitoring): 4/6 config files loaded</li><li>Section 5 (Storage): 2/2 config files loaded</li></ul>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">Remediation</div>
+                  <div class="remediation-text">Export all required OCI CLI configuration data for comprehensive CIS benchmark assessment.</div>
+                </div>
+        
+                <div class="finding-section">
+                  <div class="finding-section-title">References</div>
+                  <ul class="ref-list"><li>CIS OCI Foundation Benchmark v2.0</li></ul>
+                </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    OCI CNAPP Security Scanner &middot; Generated 2026-03-31T07:50:27 &middot;
+    For authorized security assessments only
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.finding-header').forEach(el => {
+  el.addEventListener('click', () => {
+    el.parentElement.classList.toggle('open');
+  });
+});
+
+function filterFindings(sev) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.querySelectorAll('.finding-card').forEach(card => {
+    if (sev === 'ALL' || card.dataset.severity === sev) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+window.addEventListener('beforeprint', () => {
+  document.querySelectorAll('.finding-card').forEach(c => c.classList.add('open'));
+});
+</script>
+</body>
+</html>
